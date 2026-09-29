@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMA Taman Madya Jetis — Yogyakarta | Sekolah SMA terbaik di Jetis</title>
+<title>SMA Taman Madya Jetis — Yogyakarta</title>
 <meta name="description" content="SMA Taman Madya Jetis Yogyakarta. Sekolah SMA dengan Kurikulum Merdeka, kelas kecil, dan lingkungan belajar yang hangat. Pendaftaran tahun pelajaran 2026/2027 dibuka.">
 <meta name="theme-color" content="#0f5132">
 <meta property="og:title" content="SMA Taman Madya Jetis — Yogyakarta">
@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127979;</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Lompat ke konten utama</a>
@@ -41,9 +41,11 @@
 
     <nav class="site-nav" id="site-nav" aria-label="Navigasi utama">
       <ul>
+        <li><a href="#sekilas">Sekilas</a></li>
         <li><a href="#profil">Profil</a></li>
         <li><a href="#program">Program</a></li>
         <li><a href="#fasilitas">Fasilitas</a></li>
+        <li><a href="#berita">Berita</a></li>
         <li><a href="#pengumuman">Pengumuman</a></li>
         <li><a href="#kontak">Kontak</a></li>
       </ul>
@@ -57,48 +59,38 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-pattern" aria-hidden="true"></div>
-    <div class="container hero-inner">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="dot" aria-hidden="true"></span>PPDB 2026/2027 &middot; Gelombang 1 dibuka</p>
-        <h1>Belajar yang hangat,<br>berprestasi yang <em>nyata</em>.</h1>
-        <p class="lead">
-          SMA Taman Madya Jetis adalah sekolah menengah atas di Jetis, Yogyakarta.
-          Kami memadukan Kurikulum Merdeka dengan kelas kecil, sehingga setiap
-          siswa mendapat perhatian dan ruang untuk berkembang.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-accent" href="#daftar">Mulai Pendaftaran</a>
-          <a class="btn btn-ghost" href="#profil">Pelajari Sekolah</a>
-        </div>
-        <dl class="hero-stats">
-          <div class="stat">
-            <dt>Siswa per kelas</dt>
-            <dd>28<span>orang</span></dd>
-          </div>
-          <div class="stat">
-            <dt>Tenaga pengajar</dt>
-            <dd>34<span>guru bersertifikat</span></dd>
-          </div>
-          <div class="stat">
-            <dt>Prestasi</dt>
-            <dd>120+<span>juara dalam 5 tahun</span></dd>
-          </div>
-        </dl>
-      </div>
+    <div class="container">
+      <h1 class="hero-name">SMA Taman<br>Madya <em>Jetis</em></h1>
+      <p class="hero-place">Yogyakarta</p>
+    </div>
+  </section>
 
-      <div class="hero-visual">
-        <figure class="hero-card">
-          <img src="assets/img/gedung.svg" width="640" height="800"
-               alt="Gedung utama SMA Taman Madya Jetis dilihat dari halaman depan, dengan taman di depannya."
-               loading="eager" decoding="async">
-          <figcaption>Kompleks sekolah, Jl. Kaliurang KM 4, Jetis, Yogyakarta</figcaption>
-        </figure>
-        <div class="hero-badge">
-          <strong>Akreditasi A</strong>
-          <span>Unggul &amp; Terpercaya</span>
+  <!-- SEKILAS -->
+  <section class="section" id="sekilas">
+    <div class="container">
+      <header class="section-head">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Sekilas sekolah</p>
+        <p class="section-lead">
+          SMA Taman Madya Jetis berada di Jalan Pakuningratan No. 34,
+          Cokrodiningratan, Yogyakarta. Setiap murid mendapat perhatian dari guru
+          pendamping dan ruang untuk belajar sesuai potensinya.
+        </p>
+      </header>
+
+      <dl class="stat-row">
+        <div class="stat">
+          <dt>Siswa per kelas</dt>
+          <dd>20<span>orang</span></dd>
         </div>
-      </div>
+        <div class="stat">
+          <dt>Guru</dt>
+          <dd>34<span>orang</span></dd>
+        </div>
+        <div class="stat">
+          <dt>Rombel</dt>
+          <dd>X&ndash;XII<span>kelas</span></dd>
+        </div>
+      </dl>
     </div>
   </section>
 
@@ -142,13 +134,18 @@
           <ul class="check-list">
             <li>Kurikulum Merdeka dengan Profil Pelajar Pancasila</li>
             <li>Asesmen formatif, ulangan bukan satu-satunya ukuran</li>
-            <li>Kelas kecil 28 siswa dengan dua guru pembimbing</li>
+            <li>Kelas kecil 20 siswa dengan dua guru pembimbing</li>
             <li>Program literasi dan matematika intensif sejak kelas X</li>
             <li>Bursa prestasi dan beasiswa untuk siswa berprestasi</li>
           </ul>
         </div>
 
         <aside class="split-aside reveal" aria-label="Visi dan misi">
+          <div class="card card-panel">
+            <h3>Akreditasi</h3>
+            <p class="akreditasi">B</p>
+            <p class="card-meta">Klasifikasi: Baik &middot; Tahun penilaian 2025</p>
+          </div>
           <div class="card card-panel">
             <h3>Visi</h3>
             <p>Terwujudnya generasi yang beriman, berprestasi, dan berbudaya,
@@ -247,25 +244,108 @@
 
       <ul class="gallery">
         <li class="gallery-item gallery-tall reveal">
-          <img src="assets/img/kegiatan-1.svg" width="600" height="800"
+          <img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20600%20800'%20width%3D'600'%20height%3D'800'%20role%3D'img'%20aria-label%3D'Placeholder%20gambar%20diskusi%20kelompok%20siswa'%3E%3Crect%20width%3D'600'%20height%3D'800'%20fill%3D'%23eef8f2'%2F%3E%3Crect%20y%3D'640'%20width%3D'600'%20height%3D'160'%20fill%3D'%23157347'%20opacity%3D'0.2'%2F%3E%3Cg%20fill%3D'%230f5132'%20opacity%3D'0.8'%3E%3Ccircle%20cx%3D'180'%20cy%3D'330'%20r%3D'46'%2F%3E%3Crect%20x%3D'130'%20y%3D'390'%20width%3D'100'%20height%3D'170'%20rx%3D'34'%2F%3E%3Ccircle%20cx%3D'310'%20cy%3D'300'%20r%3D'46'%2F%3E%3Crect%20x%3D'260'%20y%3D'360'%20width%3D'100'%20height%3D'200'%20rx%3D'34'%2F%3E%3Ccircle%20cx%3D'430'%20cy%3D'345'%20r%3D'46'%2F%3E%3Crect%20x%3D'380'%20y%3D'405'%20width%3D'100'%20height%3D'155'%20rx%3D'34'%2F%3E%3C%2Fg%3E%3Crect%20x%3D'120'%20y%3D'580'%20width%3D'360'%20height%3D'20'%20rx%3D'10'%20fill%3D'%23b07d1a'%20opacity%3D'0.8'%2F%3E%3Ctext%20x%3D'300'%20y%3D'730'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'22'%20fill%3D'%2333463c'%3EDiskusi%20kelompok%3C%2Ftext%3E%3C%2Fsvg%3E"
+               width="600" height="800"
                alt="Siswa berdiskusi kelompok di halaman sekolah." loading="lazy" decoding="async">
         </li>
         <li class="reveal">
-          <img src="assets/img/kegiatan-2.svg" width="600" height="400"
+          <img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20600%20400'%20width%3D'600'%20height%3D'400'%20role%3D'img'%20aria-label%3D'Placeholder%20gambar%20kegiatan%20olahraga'%3E%3Crect%20width%3D'600'%20height%3D'400'%20fill%3D'%23eef8f2'%2F%3E%3Crect%20y%3D'300'%20width%3D'600'%20height%3D'100'%20fill%3D'%23157347'%20opacity%3D'0.2'%2F%3E%3Cg%20fill%3D'%230f5132'%20opacity%3D'0.8'%3E%3Ccircle%20cx%3D'200'%20cy%3D'150'%20r%3D'34'%2F%3E%3Crect%20x%3D'165'%20y%3D'195'%20width%3D'70'%20height%3D'115'%20rx%3D'26'%2F%3E%3Ccircle%20cx%3D'330'%20cy%3D'140'%20r%3D'34'%2F%3E%3Crect%20x%3D'295'%20y%3D'185'%20width%3D'70'%20height%3D'125'%20rx%3D'26'%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D'440'%20cy%3D'200'%20r%3D'55'%20fill%3D'none'%20stroke%3D'%23b07d1a'%20stroke-width%3D'10'%20opacity%3D'0.9'%2F%3E%3Ctext%20x%3D'300'%20y%3D'365'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'20'%20fill%3D'%2333463c'%3EKegiatan%20olahraga%3C%2Ftext%3E%3C%2Fsvg%3E"
+               width="600" height="400"
                alt="Kegiatan olahraga antar siswa di lapangan sekolah." loading="lazy" decoding="async">
         </li>
         <li class="reveal">
-          <img src="assets/img/kegiatan-3.svg" width="600" height="400"
+          <img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20600%20400'%20width%3D'600'%20height%3D'400'%20role%3D'img'%20aria-label%3D'Placeholder%20gambar%20perpustakaan%20sekolah'%3E%3Crect%20width%3D'600'%20height%3D'400'%20fill%3D'%23eef8f2'%2F%3E%3Cg%20fill%3D'%230f5132'%20opacity%3D'0.8'%3E%3Crect%20x%3D'60'%20y%3D'60'%20width%3D'480'%20height%3D'60'%20rx%3D'6'%2F%3E%3Crect%20x%3D'60'%20y%3D'150'%20width%3D'480'%20height%3D'60'%20rx%3D'6'%2F%3E%3Crect%20x%3D'60'%20y%3D'240'%20width%3D'480'%20height%3D'60'%20rx%3D'6'%2F%3E%3C%2Fg%3E%3Cg%20fill%3D'%23d9a327'%20opacity%3D'0.9'%3E%3Crect%20x%3D'80'%20y%3D'74'%20width%3D'26'%20height%3D'32'%20rx%3D'3'%2F%3E%3Crect%20x%3D'116'%20y%3D'70'%20width%3D'22'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'148'%20y%3D'76'%20width%3D'30'%20height%3D'30'%20rx%3D'3'%2F%3E%3Crect%20x%3D'190'%20y%3D'72'%20width%3D'24'%20height%3D'34'%20rx%3D'3'%2F%3E%3Crect%20x%3D'224'%20y%3D'78'%20width%3D'28'%20height%3D'28'%20rx%3D'3'%2F%3E%3Crect%20x%3D'264'%20y%3D'70'%20width%3D'20'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'294'%20y%3D'74'%20width%3D'30'%20height%3D'32'%20rx%3D'3'%2F%3E%3Crect%20x%3D'336'%20y%3D'72'%20width%3D'24'%20height%3D'34'%20rx%3D'3'%2F%3E%3Crect%20x%3D'370'%20y%3D'76'%20width%3D'28'%20height%3D'30'%20rx%3D'3'%2F%3E%3Crect%20x%3D'410'%20y%3D'70'%20width%3D'22'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'442'%20y%3D'74'%20width%3D'30'%20height%3D'32'%20rx%3D'3'%2F%3E%3Crect%20x%3D'80'%20y%3D'164'%20width%3D'26'%20height%3D'32'%20rx%3D'3'%2F%3E%3Crect%20x%3D'116'%20y%3D'160'%20width%3D'22'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'148'%20y%3D'166'%20width%3D'30'%20height%3D'30'%20rx%3D'3'%2F%3E%3Crect%20x%3D'190'%20y%3D'162'%20width%3D'24'%20height%3D'34'%20rx%3D'3'%2F%3E%3Crect%20x%3D'224'%20y%3D'168'%20width%3D'28'%20height%3D'28'%20rx%3D'3'%2F%3E%3Crect%20x%3D'264'%20y%3D'160'%20width%3D'20'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'294'%20y%3D'164'%20width%3D'30'%20height%3D'32'%20rx%3D'3'%2F%3E%3Crect%20x%3D'336'%20y%3D'162'%20width%3D'24'%20height%3D'34'%20rx%3D'3'%2F%3E%3Crect%20x%3D'370'%20y%3D'166'%20width%3D'28'%20height%3D'30'%20rx%3D'3'%2F%3E%3Crect%20x%3D'410'%20y%3D'160'%20width%3D'22'%20height%3D'36'%20rx%3D'3'%2F%3E%3Crect%20x%3D'442'%20y%3D'164'%20width%3D'30'%20height%3D'32'%20rx%3D'3'%2F%3E%3C%2Fg%3E%3Ctext%20x%3D'300'%20y%3D'360'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'20'%20fill%3D'%2333463c'%3EPerpustakaan%20sekolah%3C%2Ftext%3E%3C%2Fsvg%3E"
+               width="600" height="400"
                alt="Suasana perpustakaan saat jam tambahan belajar." loading="lazy" decoding="async">
         </li>
         <li class="gallery-item gallery-wide reveal">
-          <img src="assets/img/kegiatan-4.svg" width="1200" height="400"
+          <img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%201200%20400'%20width%3D'1200'%20height%3D'400'%20role%3D'img'%20aria-label%3D'Placeholder%20gambar%20upacara%20sekolah'%3E%3Crect%20width%3D'1200'%20height%3D'400'%20fill%3D'%23eef8f2'%2F%3E%3Crect%20x%3D'330'%20y%3D'60'%20width%3D'540'%20height%3D'200'%20fill%3D'%230f5132'%20opacity%3D'0.85'%20rx%3D'8'%2F%3E%3Cpath%20d%3D'M300%2060%20600%2020l300%2040z'%20fill%3D'%23b07d1a'%20opacity%3D'0.85'%2F%3E%3Cg%20fill%3D'%230f5132'%20opacity%3D'0.75'%3E%3Crect%20x%3D'80'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'103'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'190'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'213'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'300'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'323'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'410'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'433'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'744'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'767'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'854'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'877'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'964'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'987'%20cy%3D'272'%20r%3D'22'%2F%3E%3Crect%20x%3D'1074'%20y%3D'290'%20width%3D'46'%20height%3D'80'%20rx%3D'18'%2F%3E%3Ccircle%20cx%3D'1097'%20cy%3D'272'%20r%3D'22'%2F%3E%3C%2Fg%3E%3Ctext%20x%3D'600'%20y%3D'385'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'22'%20fill%3D'%2333463c'%3EUpacara%20resmi%20sekolah%3C%2Ftext%3E%3C%2Fsvg%3E"
+               width="1200" height="400"
                alt="Upacara resmi sekolah dengan siswa berbaris rapi." loading="lazy" decoding="async">
         </li>
       </ul>
     </div>
   </section>
 
+  <!-- BERITA -->
+  <section class="section section-alt" id="berita">
+    <div class="container">
+      <header class="section-head">
+        <p class="eyebrow">Berita Sekolah</p>
+        <h2>Kabar terbaru dari Instagram kami</h2>
+        <p class="section-lead">
+          Postingan di bawah ditarik langsung dari Instagram, jadi foto, caption,
+          dan jumlah sukanya selalu yang paling baru.
+        </p>
+        <p class="berita-follow">
+          <a class="btn btn-accent" href="https://www.instagram.com/tamanmadyajetisyogya1956/" target="_blank" rel="noopener noreferrer">Ikuti @tamanmadyajetisyogya1956</a>
+        </p>
+      </header>
+
+      <!-- =============================================================
+           CARA UPDATE BERITA
+           1. Buka Instagram sekolah, buka posting yang mau ditamplkan.
+           2. Tekan tombol  "..."  di pojok posting  ->  Copy Link.
+           3. Tempel link itu ke  data-instgrm-permalink  di bawah.
+           4. Simpan file ini, lalu upload ulang ke Netlify.
+           Posting terbaru ditaruh paling atas. Maksimal 9 posting.
+           ============================================================= -->
+      <div class="embed-grid">
+
+        <!-- GANTI LINK DI SINI - Posting terbaru -->
+        <div class="embed-cell">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/Ddz7vDRSDAy/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <div class="embed-cell">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DUFMGHbkjBl/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <div class="embed-cell embed-slot">
+          <p class="embed-slot-text">
+            Slot posting 3<br>
+            <small>Tempel link posting Instagram di sini</small>
+          </p>
+        </div>
+
+        <div class="embed-cell embed-slot">
+          <p class="embed-slot-text">
+            Slot posting 4<br>
+            <small>Tempel link posting Instagram di sini</small>
+          </p>
+        </div>
+
+        <div class="embed-cell embed-slot">
+          <p class="embed-slot-text">
+            Slot posting 5<br>
+            <small>Tempel link posting Instagram di sini</small>
+          </p>
+        </div>
+
+        <div class="embed-cell embed-slot">
+          <p class="embed-slot-text">
+            Slot posting 6<br>
+            <small>Tempel link posting Instagram di sini</small>
+          </p>
+        </div>
+
+        <!--
+        CONTOH FORMAT SATU POSTING:
+
+        <div class="embed-cell">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/SHORTCODE/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+        -->
+
+      </div>
+    </div>
+  </section>
   <!-- PENGUMUMAN -->
   <section class="section" id="pengumuman">
     <div class="container">
@@ -374,10 +454,13 @@
         <div class="card card-contact reveal">
           <h3>Alamat</h3>
           <address>
-            Jl. Kaliurang KM 4, Jetis<br>
-            Sleman, Yogyakarta 55281<br>
-            Daerah Istimewa Yogyakarta
+            Jalan Pakuningratan No. 34<br>
+            Cokrodiningratan 55233<br>
+            Special Region of Yogyakarta
           </address>
+          <p class="card-meta">
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Jalan%20Pakuningratan%20No.%2034%2C%20Cokrodiningratan%2C%20Yogyakarta">Lihat di Google Maps</a>
+          </p>
         </div>
         <div class="card card-contact reveal">
           <h3>Kontak</h3>
@@ -390,9 +473,10 @@
         <div class="card card-contact reveal">
           <h3>Media Sosial</h3>
           <p>
-            <a href="#kontak">Instagram</a> &middot;
-            <a href="#kontak">Facebook</a><br>
-            <a href="#kontak">YouTube</a>
+            <a href="https://www.instagram.com/tamanmadyajetisyogya1956/" target="_blank" rel="noopener noreferrer">@tamanmadyajetisyogya1956</a>
+          </p>
+          <p class="card-meta">
+            Lihat kabar dan kegiatan terbaru sekolah di Instagram.
           </p>
         </div>
       </div>
@@ -400,7 +484,7 @@
       <div class="map-embed reveal">
         <iframe
           title="Peta lokasi SMA Taman Madya Jetis, Yogyakarta"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=110.35%2C-7.80%2C110.40%2C-7.77&amp;layer=mapnik&amp;marker=-7.785%2C110.375"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=110.3596%2C-7.7831%2C110.3686%2C-7.7786&amp;layer=mapnik&amp;marker=-7.78081%2C110.36411"
           loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </div>
@@ -411,10 +495,11 @@
   <div class="container footer-inner">
     <div>
       <strong>SMA Taman Madya Jetis</strong>
-      <p>Jl. Kaliurang KM 4, Jetis, Sleman, Yogyakarta 55281</p>
+      <p>Jalan Pakuningratan No. 34, Cokrodiningratan 55233, Special Region of Yogyakarta</p>
     </div>
     <nav aria-label="Navigasi footer">
       <ul>
+        <li><a href="#sekilas">Sekilas</a></li>
         <li><a href="#profil">Profil</a></li>
         <li><a href="#program">Program</a></li>
         <li><a href="#pengumuman">Pengumuman</a></li>
@@ -432,6 +517,7 @@
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 
-<script src="assets/js/main.js" defer></script>
+<script src="js/main.js" defer></script>
+<script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>

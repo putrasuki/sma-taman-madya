@@ -23,8 +23,9 @@ Vercel otomatis redeploy setiap kali ada push ke branch `main`.
 | File | Isi |
 | --- | --- |
 | `index.html` | Struktur halaman |
-| `assets/css/styles.css` | Styling & layout |
-| `assets/js/main.js` | Navigasi mobile, scroll reveal, active section |
-| `assets/img/*.svg` | Placeholder gambar — **ganti dengan foto asli** |
+| `css/styles.css` | Styling & layout |
+| `js/main.js` | Navigasi mobile, scroll reveal, active section |
+| `img/hero-bg.jpg` | Foto utama (dipakai sebagai background hero via CSS) |
+| `img/*.svg` | Aset cadangan: avatar, post, kegiatan, gedung |
 
-> Catatan: gambar di `assets/img/` masih placeholder SVG. Ganti dengan foto asli (format `.webp` atau `.jpg`, lalu sesuaikan path di `index.html`) agar situs tampil final.
+> Catatan: 4 gambar di section galeri masih placeholder, di-inline sebagai `data:` URI di dalam `index.html`. Ganti dengan foto asli kalau sudah tersedia.

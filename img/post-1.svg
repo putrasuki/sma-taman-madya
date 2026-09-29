@@ -1,0 +1,23 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs><linearGradient id="p1" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0f5132"/><stop offset="1" stop-color="#1c8a56"/>
+  </linearGradient></defs>
+  <rect width="800" height="600" fill="url(#p1)"/>
+  <circle cx="660" cy="90" r="150" fill="#d9a327" opacity="0.18"/>
+  <g fill="#eef8f2">
+    <rect x="0" y="470" width="800" height="130"/>
+  </g>
+  <g>
+    <g fill="#d8f0e2" opacity="0.95">
+      <circle cx="250" cy="230" r="52"/><path d="M198 300c0-32 23-52 52-52s52 20 52 52v170h-104z"/>
+      <circle cx="400" cy="200" r="52"/><path d="M348 270c0-32 23-52 52-52s52 20 52 52v200h-104z"/>
+      <circle cx="550" cy="230" r="52"/><path d="M498 300c0-32 23-52 52-52s52 20 52 52v170H498z"/>
+    </g>
+  </g>
+  <g fill="#d9a327">
+    <circle cx="250" cy="420" r="26"/><path d="M236 340l14 50 14-50" fill="none" stroke="#d9a327" stroke-width="8"/>
+    <circle cx="400" cy="400" r="30"/><path d="M384 306l16 56 16-56" fill="none" stroke="#d9a327" stroke-width="8"/>
+    <circle cx="550" cy="420" r="26"/><path d="M536 340l14 50 14-50" fill="none" stroke="#d9a327" stroke-width="8"/>
+  </g>
+  <text x="400" y="545" text-anchor="middle" font-family="sans-serif" font-size="30" font-weight="700" fill="#0f5132">TIM OSN FISIKA</text>
+</svg>

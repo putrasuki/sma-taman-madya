@@ -1,0 +1,19 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#eef8f2"/>
+  <rect x="0" y="430" width="800" height="170" fill="#157347" opacity="0.22"/>
+  <g stroke="#ffffff" stroke-width="6" fill="none" opacity="0.85">
+    <path d="M400 430v170M0 515h800"/>
+  </g>
+  <g fill="none" stroke="#ffffff" stroke-width="8" opacity="0.9">
+    <rect x="620" y="440" width="150" height="150"/>
+  </g>
+  <g fill="#0f5132" opacity="0.85">
+    <circle cx="260" cy="230" r="48"/><path d="M206 296c0-30 24-52 54-52s54 22 54 52v134H206z"/>
+    <circle cx="450" cy="205" r="48"/><path d="M396 271c0-30 24-52 54-52s54 22 54 52v159H396z"/>
+  </g>
+  <g fill="#b07d1a">
+    <circle cx="350" cy="300" r="30"/>
+    <path d="M330 300h40M350 280v40" stroke="#b07d1a" stroke-width="4"/>
+  </g>
+  <text x="400" y="565" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f5132">LATIHAN EKSTRAKURIKULER FUTSAL</text>
+</svg>

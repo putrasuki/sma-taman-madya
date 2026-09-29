@@ -1,0 +1,16 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#fdf1d4"/>
+  <rect x="0" y="0" width="800" height="90" fill="#0f5132"/>
+  <text x="400" y="58" text-anchor="middle" font-family="sans-serif" font-size="34" font-weight="700" fill="#fff">PPDB 2026/2027</text>
+  <rect x="90" y="140" width="620" height="330" rx="18" fill="#fff" stroke="#d9a327" stroke-width="5"/>
+  <text x="400" y="205" text-anchor="middle" font-family="sans-serif" font-size="27" font-weight="700" fill="#0f5132">SMA TAMAN MADYA JETIS</text>
+  <text x="400" y="245" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#33463c">Gelombang 1 dibuka</text>
+  <g fill="#0f5132" opacity="0.9">
+    <rect x="150" y="285" width="500" height="12" rx="6"/>
+    <rect x="150" y="320" width="420" height="12" rx="6"/>
+    <rect x="150" y="355" width="460" height="12" rx="6"/>
+  </g>
+  <rect x="150" y="395" width="500" height="52" rx="26" fill="#d9a327"/>
+  <text x="400" y="430" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#12211a">Kuota 28 siswa per kelas</text>
+  <text x="400" y="520" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="600" fill="#b07d1a">sampai 30 Oktober 2026</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" role="img" aria-label="Placeholder gambar kegiatan olahraga">
+  <rect width="600" height="400" fill="#eef8f2"/>
+  <rect y="300" width="600" height="100" fill="#157347" opacity="0.2"/>
+  <g fill="#0f5132" opacity="0.8">
+    <circle cx="200" cy="150" r="34"/>
+    <rect x="165" y="195" width="70" height="115" rx="26"/>
+    <circle cx="330" cy="140" r="34"/>
+    <rect x="295" y="185" width="70" height="125" rx="26"/>
+  </g>
+  <circle cx="440" cy="200" r="55" fill="none" stroke="#b07d1a" stroke-width="10" opacity="0.9"/>
+  <text x="300" y="365" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#33463c">Kegiatan olahraga</text>
+</svg>
