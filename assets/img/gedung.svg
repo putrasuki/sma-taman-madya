@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800" role="img" aria-label="Gedung utama SMA Taman Madya Jetis">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef8f2"/>
+      <stop offset="1" stop-color="#d8f0e2"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8efea"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="800" fill="url(#sky)"/>
+  <circle cx="500" cy="120" r="56" fill="#d9a327" opacity="0.35"/>
+
+  <rect x="120" y="300" width="400" height="330" rx="10" fill="url(#wall)" stroke="#93a49a" stroke-width="3"/>
+  <rect x="100" y="255" width="440" height="55" rx="8" fill="#157347"/>
+  <rect x="290" y="215" width="60" height="45" fill="#b07d1a"/>
+  <rect x="315" y="170" width="10" height="50" fill="#33463c"/>
+  <path d="M325 170 L345 200 L305 200 Z" fill="#d9a327"/>
+
+  <g fill="#d8f0e2" stroke="#93a49a" stroke-width="2">
+    <rect x="160" y="345" width="70" height="85" rx="5"/>
+    <rect x="285" y="345" width="70" height="85" rx="5"/>
+    <rect x="410" y="345" width="70" height="85" rx="5"/>
+    <rect x="160" y="465" width="70" height="85" rx="5"/>
+    <rect x="410" y="465" width="70" height="85" rx="5"/>
+  </g>
+
+  <rect x="270" y="510" width="100" height="120" rx="6" fill="#0f5132"/>
+  <rect x="290" y="535" width="60" height="20" rx="3" fill="#d9a327"/>
+  <path d="M270 510 L370 510 L370 495 L320 470 L270 495 Z" fill="#1c8a56"/>
+
+  <rect y="630" width="640" height="170" fill="#d8f0e2"/>
+  <g fill="#1c8a56">
+    <circle cx="80" cy="700" r="42"/>
+    <rect x="76" y="700" width="8" height="60"/>
+    <circle cx="560" cy="710" r="36"/>
+    <rect x="556" y="710" width="8" height="54"/>
+  </g>
+  <rect x="180" y="712" width="280" height="10" rx="5" fill="#93a49a"/>
+
+  <text x="320" y="196" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#0f5132">SMA TAMAN MADYA</text>
+  <text x="320" y="770" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#5c6f65">Placeholder — ganti dengan foto asli</text>
+</svg>

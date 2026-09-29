@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-label="Upacara resmi sekolah dengan siswa berbaris rapi">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef8f2"/>
+      <stop offset="1" stop-color="#d8f0e2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#sky)"/>
+
+  <rect x="440" y="90" width="320" height="150" rx="8" fill="#ffffff" stroke="#93a49a" stroke-width="3"/>
+  <rect x="420" y="66" width="360" height="30" rx="6" fill="#157347"/>
+  <g fill="#1c8a56">
+    <rect x="500" y="90" width="6" height="120"/>
+    <rect x="694" y="90" width="6" height="120"/>
+  </g>
+  <rect x="575" y="180" width="50" height="60" fill="#0f5132"/>
+  <text x="600" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" font-weight="600" fill="#0f5132">Upacara Bendera</text>
+
+  <rect y="240" width="1200" height="160" fill="#d8f0e2"/>
+  <rect y="240" width="1200" height="8" fill="#157347" opacity="0.4"/>
+
+  <g>
+    <g id="row">
+      <circle cx="0" cy="286" r="15" fill="#33463c"/>
+      <path d="M-19 300 h38 l-5 46 h-28 z" fill="#0f5132"/>
+    </g>
+    <use href="#row" x="200" y="30"/>
+    <use href="#row" x="260" y="30"/>
+    <use href="#row" x="320" y="30"/>
+    <use href="#row" x="380" y="30"/>
+    <use href="#row" x="820" y="30"/>
+    <use href="#row" x="880" y="30"/>
+    <use href="#row" x="940" y="30"/>
+    <use href="#row" x="1000" y="30"/>
+    <g transform="translate(120,30)"><circle cx="0" cy="286" r="17" fill="#33463c"/><path d="M-22 302 h44 l-6 50 h-32 z" fill="#b07d1a"/><rect x="-4" y="250" width="8" height="40" fill="#d9a327"/></g>
+    <g transform="translate(1080,30)"><circle cx="0" cy="286" r="17" fill="#33463c"/><path d="M-22 302 h44 l-6 50 h-32 z" fill="#b07d1a"/><rect x="-4" y="250" width="8" height="40" fill="#d9a327"/></g>
+  </g>
+
+  <text x="600" y="380" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" fill="#5c6f65">Placeholder — ganti dengan foto asli</text>
+</svg>
