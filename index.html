@@ -287,8 +287,9 @@
            1. Buka Instagram sekolah, buka posting yang mau ditamplkan.
            2. Tekan tombol  "..."  di pojok posting  ->  Copy Link.
            3. Tempel link itu ke  data-instgrm-permalink  di bawah.
-           4. Simpan file ini, lalu upload ulang ke Netlify.
-           Posting terbaru ditaruh paling atas. Maksimal 9 posting.
+           4. Jalankan:  git add -A; git commit -m "berita"; git push
+              Vercel otomatis redeploy. Posting terbaru ditaruh paling atas.
+           Maksimal 9 posting.
            ============================================================= -->
       <div class="embed-grid">
 
@@ -305,11 +306,10 @@
             data-instgrm-version="14"></blockquote>
         </div>
 
-        <div class="embed-cell embed-slot">
-          <p class="embed-slot-text">
-            Slot posting 3<br>
-            <small>Tempel link posting Instagram di sini</small>
-          </p>
+        <div class="embed-cell">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/Da1El3mSqsE/"
+            data-instgrm-version="14"></blockquote>
         </div>
 
         <div class="embed-cell embed-slot">
