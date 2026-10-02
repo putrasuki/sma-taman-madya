@@ -810,6 +810,169 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
   .berita-badge { opacity: 1; }
 }
 
+/* ---------- 19c. Halaman detail berita ---------- */
+.berita-detail-inner {
+  max-width: 46rem;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+  color: var(--ink-500);
+  font-size: var(--step--1);
+}
+
+.breadcrumb a { color: var(--green-700); text-underline-offset: 3px; }
+.breadcrumb a:hover { color: var(--green-800); }
+
+.breadcrumb-current {
+  color: var(--ink-700);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 22rem;
+}
+
+.berita-detail-status {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-7) 0;
+  color: var(--ink-500);
+}
+
+.berita-spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid var(--line);
+  border-top-color: var(--green-700);
+  border-radius: 50%;
+  animation: berita-spin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes berita-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .berita-spinner { animation-duration: 2s; }
+}
+
+.berita-detail-head { margin-bottom: var(--sp-5); }
+
+.berita-detail-head h1 {
+  margin-top: var(--sp-2);
+  font-size: var(--step-3);
+  line-height: 1.2;
+}
+
+.berita-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.berita-tag {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  background: var(--green-050);
+  color: var(--green-700);
+  font-size: var(--step--1);
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.berita-detail-figure { margin: 0; }
+
+.berita-detail-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  background: var(--green-050);
+}
+
+.berita-detail-caption {
+  margin-top: var(--sp-3);
+  color: var(--ink-500);
+  font-size: var(--step--1);
+  line-height: 1.6;
+}
+
+.berita-detail-body { margin-top: var(--sp-6); }
+
+.berita-detail-text {
+  color: var(--ink-700);
+  font-size: var(--step-0);
+  line-height: 1.75;
+}
+
+.berita-detail-text + .berita-detail-text { margin-top: var(--sp-4); }
+
+.berita-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+
+.berita-detail-nav {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.berita-detail-navlink {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-4);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.berita-detail-navlink:hover {
+  border-color: var(--green-600);
+  transform: translateY(-1px);
+}
+
+.berita-detail-navlabel {
+  color: var(--green-700);
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.berita-detail-navtitle {
+  color: var(--ink-900);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.berita-detail-navlink-next { text-align: right; }
+
+.berita-detail-error {
+  padding: var(--sp-7) 0;
+  text-align: center;
+}
+
+.berita-detail-error h2 { margin-bottom: var(--sp-3); }
+.berita-detail-error p { margin-bottom: var(--sp-5); color: var(--ink-700); }
+.berita-detail-error .btn { justify-self: center; }
+
+@media (min-width: 40rem) {
+  .berita-detail-nav { grid-template-columns: 1fr 1fr; }
+}
+
 /* ---------- 20. Breakpoints ---------- */
 @media (min-width: 40rem) {
   .values-grid { grid-template-columns: repeat(2, 1fr); }

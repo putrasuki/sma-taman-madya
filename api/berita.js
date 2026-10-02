@@ -43,18 +43,43 @@ module.exports = async function handler(req, res) {
     }
 
     const payload = await upstream.json();
-    const items = Array.isArray(payload.data) ? payload.data : [];
+    const items = (Array.isArray(payload.data) ? payload.data : []).map(normalise);
 
-    res.status(200).json({
+    /* ---- Mode detail: /api/berita?id=<shortCode> ---- */
+    const rawId = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
+    if (rawId) {
+      const needle = String(rawId).trim();
+      const found = items.find(
+        (item) => item.shortCode === needle || item.id === needle
+      );
+
+      if (!found) {
+        return res.status(404).json({ ok: false, error: "berita_tidak_ditemukan", item: null });
+      }
+
+      const position = items.indexOf(found);
+      return res.status(200).json({
+        ok: true,
+        updatedAt: new Date().toISOString(),
+        item: found,
+        prev: position > 0 ? items[position - 1] : null,
+        next: position < items.length - 1 ? items[position + 1] : null,
+        total: items.length,
+      });
+    }
+
+    /* ---- Mode daftar ---- */
+    return res.status(200).json({
       ok: true,
       updatedAt: new Date().toISOString(),
-      items: items.map(normalise),
+      items,
     });
   } catch (error) {
-    res.status(200).json({
+    return res.status(200).json({
       ok: false,
       error: String(error.message || error),
       items: [],
+      item: null,
     });
   }
 };

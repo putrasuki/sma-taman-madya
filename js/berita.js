@@ -37,10 +37,11 @@
 
     const media = document.createElement("a");
     media.className = "berita-media";
-    media.href = item.postUrl;
-    media.target = "_blank";
-    media.rel = "noopener noreferrer";
-    media.setAttribute("aria-label", title);
+    media.href = `berita.html?id=${encodeURIComponent(item.shortCode)}`;
+    media.setAttribute(
+      "aria-label",
+      `Baca berita: ${title}`
+    );
 
     const img = document.createElement("img");
     img.src = item.thumbnail
