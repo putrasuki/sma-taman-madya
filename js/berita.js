@@ -33,7 +33,7 @@
   const createCard = (item) => {
     const { title, excerpt } = splitCaption(item.text);
     const fig = document.createElement("article");
-    fig.className = "berita-card reveal";
+    fig.className = "berita-card reveal is-visible";
 
     const media = document.createElement("a");
     media.className = "berita-media";
@@ -92,6 +92,9 @@
   const showFallback = () => {
     grid.classList.remove("is-loading");
     grid.classList.add("is-fallback");
+    grid.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => {
+      el.classList.add("is-visible");
+    });
   };
 
   const render = (items) => {
@@ -99,23 +102,6 @@
     items.forEach((item) => fragment.appendChild(createCard(item)));
     grid.replaceChildren(fragment);
     grid.classList.remove("is-loading", "is-fallback");
-
-    const cards = grid.querySelectorAll(".berita-card");
-    if (cards.length && "IntersectionObserver" in window) {
-      const spy = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            spy.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.1 }
-      );
-      cards.forEach((card) => spy.observe(card));
-    } else {
-      cards.forEach((card) => card.classList.add("is-visible"));
-    }
   };
 
   const load = () => {
