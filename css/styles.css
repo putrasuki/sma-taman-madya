@@ -1,5 +1,5 @@
 /* ============================================================
-   SMA Taman Madya Jetis — style.css
+   SMA Taman Madya Jetis â€” style.css
    Mobile-first. Design tokens via custom properties.
    ============================================================ */
 
@@ -329,7 +329,7 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
   overflow: hidden;
   padding-block: var(--sp-8) var(--sp-8);
   background-color: var(--green-800);
-  background-image: url("img/hero-bg.jpg");
+  background-image: url("../img/hero-bg.jpg");
   background-size: cover;
   background-position: center 30%;
   text-align: center;
