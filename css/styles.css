@@ -260,7 +260,7 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
   flex-shrink: 0;
 }
 
-.brand-text { display: flex; flex-direction: column; line-height: 1.25; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-text strong { font-size: 0.98rem; font-weight: 700; }
 .brand-text small { color: var(--ink-500); font-size: 0.78rem; }
 
