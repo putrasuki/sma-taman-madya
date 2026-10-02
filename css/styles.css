@@ -888,8 +888,7 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 
 .berita-detail-figure { margin: 0; }
 
-.berita-detail-figure img,
-.berita-detail-figure video {
+.berita-detail-figure img {
   display: block;
   width: 100%;
   height: auto;
@@ -897,7 +896,17 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
   background: var(--green-050);
 }
 
-.berita-detail-figure video { aspect-ratio: 4 / 5; object-fit: contain; }
+/* Video memakai rasio isi sebenarnya (di-set dari metadata), supaya tidak
+   ada bingkai kosong. Nilai awal hanya sementara sebelum metadata arrive. */
+.berita-detail-figure video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  background: #000;
+}
 
 .berita-detail-caption {
   margin-top: var(--sp-3);

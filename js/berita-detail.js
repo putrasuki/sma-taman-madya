@@ -141,6 +141,14 @@
       videoEl.src = videoProxyUrl(item.videoUrl);
       videoEl.hidden = false;
       imageEl.hidden = true;
+
+      /* Samakan rasio kotak dengan rasio video aslinya supaya tidak ada
+         bingkai kosong di samping/bawah. */
+      videoEl.addEventListener("loadedmetadata", () => {
+        if (videoEl.videoWidth && videoEl.videoHeight) {
+          videoEl.style.aspectRatio = `${videoEl.videoWidth} / ${videoEl.videoHeight}`;
+        }
+      }, { once: true });
     } else {
       videoEl.hidden = true;
       videoEl.removeAttribute("src");
