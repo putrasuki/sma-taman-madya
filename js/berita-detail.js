@@ -66,7 +66,6 @@
   const bodyEl = document.querySelector("[data-detail-body]");
   const errorEl = document.querySelector("[data-detail-error]");
   const errorText = document.querySelector("[data-detail-error-text]");
-  const crumbEl = document.querySelector("[data-detail-crumb]");
   const metaEl = document.querySelector("[data-detail-meta]");
   const titleEl = document.querySelector("[data-detail-title]");
   const tagsEl = document.querySelector("[data-detail-tags]");
@@ -79,15 +78,15 @@
   const prevTitle = document.querySelector("[data-detail-prev-title]");
   const nextTitle = document.querySelector("[data-detail-next-title]");
 
+  const crumbParts = document.querySelectorAll("[data-detail-crumb]");
+  const crumbCurrent = document.querySelector(".breadcrumb-current");
+
   const showError = (message) => {
     if (statusEl) statusEl.hidden = true;
     if (bodyEl) bodyEl.hidden = true;
     if (errorEl) errorEl.hidden = false;
     if (errorText && message) errorText.textContent = message;
-    if (crumbEl) {
-      const parts = document.querySelectorAll("[data-detail-crumb]");
-      parts.forEach((el) => { el.hidden = true; });
-    }
+    if (crumbCurrent) crumbCurrent.textContent = "Tidak ditemukan";
   };
 
   const setMeta = (item) => {
@@ -104,11 +103,8 @@
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc && item.text) ogDesc.setAttribute("content", item.text.slice(0, 180));
 
-    if (crumbEl) {
-      const parts = document.querySelectorAll("[data-detail-crumb]");
-      parts.forEach((el) => { el.hidden = false; });
-      crumbEl.textContent = title;
-    }
+    crumbParts.forEach((el) => { el.hidden = false; });
+    if (crumbCurrent) crumbCurrent.textContent = title;
   };
 
   const render = (payload) => {
