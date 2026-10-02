@@ -61,6 +61,8 @@
   const thumbUrl = (src) =>
     src ? `/api/thumbnail?url=${encodeURIComponent(src)}` : "/img/berita/berita-1.jpg";
 
+  const videoProxyUrl = (src) => `/api/video?url=${encodeURIComponent(src)}`;
+
   /* ---------- Elemen ---------- */
   const statusEl = document.querySelector("[data-detail-status]");
   const bodyEl = document.querySelector("[data-detail-body]");
@@ -70,6 +72,7 @@
   const titleEl = document.querySelector("[data-detail-title]");
   const tagsEl = document.querySelector("[data-detail-tags]");
   const imageEl = document.querySelector("[data-detail-image]");
+  const videoEl = document.querySelector("[data-detail-video]");
   const captionEl = document.querySelector("[data-detail-caption]");
   const igEl = document.querySelector("[data-detail-ig]");
   const navEl = document.querySelector("[data-detail-nav]");
@@ -130,11 +133,24 @@
 
     titleEl.textContent = shortTitle(item.text);
 
-    imageEl.src = thumbUrl(item.thumbnail);
-    imageEl.alt = shortTitle(item.text);
-    imageEl.addEventListener("error", () => {
-      imageEl.src = "/img/berita/berita-1.jpg";
-    }, { once: true });
+    const poster = thumbUrl(item.thumbnail);
+
+    /* Video: pakai <video> kalau ada sumbernya, kalau tidak tetap gambar. */
+    if (item.isVideo && item.videoUrl) {
+      videoEl.poster = poster;
+      videoEl.src = videoProxyUrl(item.videoUrl);
+      videoEl.hidden = false;
+      imageEl.hidden = true;
+    } else {
+      videoEl.hidden = true;
+      videoEl.removeAttribute("src");
+      imageEl.hidden = false;
+      imageEl.src = poster;
+      imageEl.alt = shortTitle(item.text);
+      imageEl.addEventListener("error", () => {
+        imageEl.src = "/img/berita/berita-1.jpg";
+      }, { once: true });
+    }
 
     const full = String(item.text || "").trim();
 

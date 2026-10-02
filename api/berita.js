@@ -23,6 +23,7 @@ function normalise(item) {
     text,
     hashtags: Array.isArray(item.hashtags) ? item.hashtags : [],
     thumbnail: item.thumbnail_url || (Array.isArray(item.images) ? item.images[0] : "") || "",
+    videoUrl: item.is_video ? item.video_url || "" : "",
     likes: Number(item.likes) || 0,
     postedAt: item.posted_at,
     postUrl: item.post_url || `https://www.instagram.com/p/${item.short_code}/`,

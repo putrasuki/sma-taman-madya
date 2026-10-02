@@ -888,13 +888,16 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 
 .berita-detail-figure { margin: 0; }
 
-.berita-detail-figure img {
+.berita-detail-figure img,
+.berita-detail-figure video {
   display: block;
   width: 100%;
   height: auto;
   border-radius: var(--radius-lg);
   background: var(--green-050);
 }
+
+.berita-detail-figure video { aspect-ratio: 4 / 5; object-fit: contain; }
 
 .berita-detail-caption {
   margin-top: var(--sp-3);
