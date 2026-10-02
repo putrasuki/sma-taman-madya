@@ -282,24 +282,23 @@
         </p>
       </header>
 
-      <div class="berita-grid">
-
+      <!-- Kartu fallback statis. Kalau /api/berita hidup, js/berita.js
+           menggantinya otomatis dengan data terbaru dari Instagram. -->
+      <div class="berita-grid" data-berita-grid>
         <article class="berita-card reveal">
-          <a class="berita-media" href="https://www.instagram.com/p/DYhRSmbyDz8/" target="_blank" rel="noopener noreferrer">
+          <a class="berita-media" href="https://www.instagram.com/reel/DYhRSmbyDz8/" target="_blank" rel="noopener noreferrer">
             <img src="img/berita/berita-1.jpg" width="640" height="800" loading="lazy" decoding="async"
                  alt="Postingan Instagram SMA Taman Madya Jetis">
             <span class="berita-badge">Lihat</span>
           </a>
         </article>
-
         <article class="berita-card reveal">
-          <a class="berita-media" href="https://www.instagram.com/p/DWv57X4kquY/" target="_blank" rel="noopener noreferrer">
+          <a class="berita-media" href="https://www.instagram.com/reel/DWv57X4kquY/" target="_blank" rel="noopener noreferrer">
             <img src="img/berita/berita-2.jpg" width="640" height="800" loading="lazy" decoding="async"
                  alt="Postingan Instagram SMA Taman Madya Jetis">
             <span class="berita-badge">Lihat</span>
           </a>
         </article>
-
         <article class="berita-card reveal">
           <a class="berita-media" href="https://www.instagram.com/p/Da1El3mSqsE/" target="_blank" rel="noopener noreferrer">
             <img src="img/berita/berita-3.jpg" width="864" height="1080" loading="lazy" decoding="async"
@@ -307,32 +306,9 @@
             <span class="berita-badge">Lihat</span>
           </a>
         </article>
-
-        <article class="berita-card reveal">
-          <a class="berita-media" href="https://www.instagram.com/p/Ddz7vDRSDAy/" target="_blank" rel="noopener noreferrer">
-            <img src="img/berita/berita-4.jpg" width="1080" height="1350" loading="lazy" decoding="async"
-                 alt="Postingan Instagram SMA Taman Madya Jetis">
-            <span class="berita-badge">Lihat</span>
-          </a>
-        </article>
-
-        <article class="berita-card reveal">
-          <a class="berita-media" href="https://www.instagram.com/p/DUFMGHbkjBl/" target="_blank" rel="noopener noreferrer">
-            <img src="img/berita/berita-5.jpg" width="1080" height="1350" loading="lazy" decoding="async"
-                 alt="Postingan Instagram SMA Taman Madya Jetis">
-            <span class="berita-badge">Lihat</span>
-          </a>
-        </article>
-
-        <article class="berita-card reveal">
-          <a class="berita-media" href="https://www.instagram.com/p/DauwUJYyt4O/" target="_blank" rel="noopener noreferrer">
-            <img src="img/berita/berita-6.jpg" width="828" height="1035" loading="lazy" decoding="async"
-                 alt="Postingan Instagram SMA Taman Madya Jetis">
-            <span class="berita-badge">Lihat</span>
-          </a>
-        </article>
-
       </div>
+
+      <p class="berita-status" data-berita-status hidden></p>
     </div>
   </section>
   <!-- PENGUMUMAN -->
@@ -506,6 +482,7 @@
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 
-<script src="js/main.js" defer></script>
+<script src="js/main.js" defer>
+<script src="js/berita.js" defer></script>
 </body>
 </html>
