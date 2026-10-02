@@ -43,10 +43,15 @@
     media.setAttribute("aria-label", title);
 
     const img = document.createElement("img");
-    img.src = item.thumbnail;
+    img.src = item.thumbnail
+      ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
+      : "/img/berita/berita-1.jpg";
     img.alt = title;
     img.loading = "lazy";
     img.decoding = "async";
+    img.addEventListener("error", () => {
+      img.src = "/img/berita/berita-1.jpg";
+    });
     media.appendChild(img);
 
     if (item.isVideo) {
