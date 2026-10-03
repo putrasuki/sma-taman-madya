@@ -46,40 +46,43 @@
     const fig = document.createElement("article");
     fig.className = "berita-card reveal is-visible";
 
-    const detailUrl = item.shortCode
-      ? `berita.html?id=${encodeURIComponent(item.shortCode)}`
-      : item.postUrl;
-
-    const media = document.createElement(detailUrl ? "a" : "div");
+    /* Kartu tidak lagi membuka halaman detail; foto dan tombolnya mengarah ke
+       post asli di Instagram. Halaman detail berita.html tetap bisa dibuka
+       langsung, tapi bukan lagi tujuan klik dari daftar. */
+    const media = document.createElement("a");
     media.className = "berita-media";
-    if (detailUrl) {
-      media.href = detailUrl;
-      media.setAttribute("aria-label", `Baca berita: ${judul}`);
-    }
+    media.href = item.postUrl;
+    media.target = "_blank";
+    media.rel = "noopener noreferrer";
+    media.setAttribute("aria-label", `Lihat di Instagram: ${judul}`);
 
-    /* Thumbnail lewat proxy pakai shortCode supaya proxy ambil URL baru dari
-       upstream (URL Instagram cepat kedaluwarsa). Kalau gagal, turun ke cover. */
+    /* Selalu ada gambar: thumbnail dari proxy (kalau ada), kalau gagal turun ke
+       cover kategori. Cover kategori juga jadi gambar awal untuk berita yang
+       tidak punya thumbnail, sehingga tidak pernah ada kartu kosong. */
+    const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
+
     const img = document.createElement("img");
     img.alt = judul;
     img.loading = "lazy";
     img.decoding = "async";
 
-    if (item.thumbnail) {
-      img.src = item.shortCode
-        ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
-        : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+    const showCover = () => {
+      if (img.src.endsWith(fallbackCover)) return;
+      img.classList.add("berita-cover");
+      img.src = fallbackCover;
+    };
 
-      img.addEventListener(
-        "error",
-        () => {
-          if (img.src.endsWith(item.cover || "")) return;
-          img.src = item.cover || "/img/berita/cover-berita.svg";
-        },
-        { once: true }
-      );
+    const proxySrc = item.thumbnail
+      ? item.shortCode
+        ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
+        : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
+      : "";
+
+    if (proxySrc) {
+      img.addEventListener("error", showCover, { once: true });
+      img.src = proxySrc;
     } else {
-      img.className = "berita-cover";
-      img.src = item.cover || "/img/berita/cover-berita.svg";
+      showCover();
     }
 
     media.appendChild(img);
@@ -126,6 +129,15 @@
       para.textContent = excerpt;
       body.appendChild(para);
     }
+
+    const link = document.createElement("a");
+    link.className = "berita-link";
+    link.href = item.postUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Lihat di Instagram";
+    link.setAttribute("aria-label", `Lihat "${judul}" di Instagram`);
+    body.appendChild(link);
 
     fig.appendChild(body);
     return fig;
