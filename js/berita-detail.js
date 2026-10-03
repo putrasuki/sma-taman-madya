@@ -65,9 +65,54 @@
       : cover;
   };
 
-  const videoProxyUrl = (src) => `/api/video?url=${encodeURIComponent(src)}`;
+  /* Proxy video lebih aman kalau dipanggil per shortCode: /api/video?id=...
+     mengambil ulang URL mp4 dari upstream, jadi tidak ikut basi saat cache. */
+  const videoProxyUrl = (item) =>
+    item.shortCode
+      ? `/api/video?id=${encodeURIComponent(item.shortCode)}`
+      : `/api/video?url=${encodeURIComponent(item.videoUrl)}`;
+
+  /* Cadangan terakhir: embed resmi Instagram (mp4 bisa kedaluwarsa). */
+  const embedUrl = (item) =>
+    item.shortCode
+      ? `https://www.instagram.com/p/${encodeURIComponent(item.shortCode)}/embed/captioned/`
+      : "";
+
+  const removeEmbed = () => {
+    const frame = document.querySelector("[data-detail-embed]");
+    if (frame) frame.remove();
+  };
+
+  const showEmbed = (item) => {
+    removeEmbed();
+
+    videoEl.hidden = true;
+    videoEl.removeAttribute("src");
+    imageEl.hidden = true;
+
+    const wrap = document.createElement("div");
+    wrap.className = "berita-embed";
+    wrap.setAttribute("data-detail-embed", "");
+
+    const iframe = document.createElement("iframe");
+    iframe.src = embedUrl(item);
+    iframe.title = `Instagram: ${item.judulKurasi || shortTitle(item.text)}`;
+    iframe.loading = "lazy";
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.allowFullscreen = true;
+    wrap.appendChild(iframe);
+
+    const note = document.createElement("p");
+    note.className = "berita-embed-note";
+    note.textContent =
+      "Video dimuat langsung dari Instagram. Jika tidak muncul, buka lewat tombol “Lihat di Instagram”.";
+    wrap.appendChild(note);
+
+    if (figureEl) figureEl.appendChild(wrap);
+  };
 
   /* ---------- Elemen ---------- */
+  const figureEl = document.querySelector(".berita-detail-figure");
   const statusEl = document.querySelector("[data-detail-status]");
   const bodyEl = document.querySelector("[data-detail-body]");
   const errorEl = document.querySelector("[data-detail-error]");
@@ -139,29 +184,59 @@
 
     const poster = thumbUrl(item);
 
-    /* Video: pakai <video> kalau ada sumbernya, kalau tidak tetap gambar. */
-    if (item.isVideo && item.videoUrl) {
-      videoEl.poster = poster;
-      videoEl.src = videoProxyUrl(item.videoUrl);
-      videoEl.hidden = false;
-      imageEl.hidden = true;
-
-      /* Samakan rasio kotak dengan rasio video aslinya supaya tidak ada
-         bingkai kosong di samping/bawah. */
-      videoEl.addEventListener("loadedmetadata", () => {
-        if (videoEl.videoWidth && videoEl.videoHeight) {
-          videoEl.style.aspectRatio = `${videoEl.videoWidth} / ${videoEl.videoHeight}`;
-        }
-      }, { once: true });
-    } else {
+    const showImage = () => {
+      removeEmbed();
       videoEl.hidden = true;
       videoEl.removeAttribute("src");
       imageEl.hidden = false;
       imageEl.src = poster;
       imageEl.alt = item.judulKurasi || shortTitle(item.text);
-      imageEl.addEventListener("error", () => {
-        imageEl.src = item.cover || "/img/berita/cover-berita.svg";
-      }, { once: true });
+      imageEl.addEventListener(
+        "error",
+        () => {
+          imageEl.src = item.cover || "/img/berita/cover-berita.svg";
+        },
+        { once: true }
+      );
+    };
+
+    /* Video: coba <video> dari proxy; kalau mp4 Instagram sudah kedaluwarsa
+       (502/403), otomatis ganti ke embed Instagram agar tetap bisa dibuka. */
+    const bisaStream =
+      item.isVideo && item.shortCode && (item.videoUrl || item.sumber !== "katalog");
+
+    if (bisaStream) {
+      removeEmbed();
+      videoEl.poster = poster;
+      videoEl.hidden = false;
+      imageEl.hidden = true;
+
+      /* Samakan rasio kotak dengan rasio video aslinya supaya tidak ada
+         bingkai kosong di samping/bawah. */
+      videoEl.addEventListener(
+        "loadedmetadata",
+        () => {
+          if (videoEl.videoWidth && videoEl.videoHeight) {
+            videoEl.style.aspectRatio = `${videoEl.videoWidth} / ${videoEl.videoHeight}`;
+          }
+        },
+        { once: true }
+      );
+
+      videoEl.addEventListener(
+        "error",
+        () => {
+          if (embedUrl(item)) showEmbed(item);
+        },
+        { once: true }
+      );
+
+      videoEl.src = videoProxyUrl(item);
+    } else if (item.isVideo && embedUrl(item)) {
+      /* Reel dari katalog sekolah: tidak ada mp4 di API, jadi embed saja. */
+      showEmbed(item);
+    } else {
+      showImage();
     }
 
     const full = String(item.text || "").trim();

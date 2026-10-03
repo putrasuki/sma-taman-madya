@@ -52,6 +52,18 @@ Hasil gabungan: **25 berita** (12 dari API + 13 dari katalog). Berita dari katal
 punya thumbnail, jadi kartu memakai cover kategori `img/berita/cover-<kategori>.svg`
 dan menampilkan badge kategori.
 
+### Video
+
+URL mp4 Instagram hanya berlaku beberapa jam (parameter `oe`), sehingga seringanya 403
+dan video tidak bisa diputar. Karena itu halaman detail memanggil
+`/api/video?id=<shortCode>` — proxy itu mengambil ulang `video_url` dari upstream setiap
+kali video dibuka, bukan memakai URL yang ikut ter-cache di `/api/berita`.
+
+Kalau URL-nya masih kedaluwarsa, proxy membalas 502 dan `js/berita-detail.js` otomatis
+mengganti `<video>` dengan embed resmi Instagram (`/p/<shortCode>/embed/captioned/`).
+Reel yang hanya ada di katalog (tanpa `video_url`) langsung memakai embed. Tombol
+"Lihat di Instagram" selalu tersedia sebagai jalan terakhir.
+
 Menambah berita: append ke `data/berita.json` dengan `shortCode`, `kategori`, `tipe`
 (`reel`/`post`/`info`), `judul`, `ringkas`, dan `url`. Tanggal (`tanggal`) boleh diisi
 dari shortcode Instagram:

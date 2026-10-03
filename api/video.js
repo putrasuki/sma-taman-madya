@@ -1,5 +1,8 @@
 const ALLOWED_HOSTS = ["cdninstagram.com", "fbcdn.net"];
 
+const UPSTREAM =
+  "https://api-ig-ruddy.vercel.app/api/berita/sekolah/tamanmadyajetisyogya1956";
+
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
@@ -14,15 +17,36 @@ const isAllowed = (raw) => {
   }
 };
 
+/* URL mp4 Instagram hanya berlaku beberapa jam (parameter `oe`), jadi jangan
+  andalkan URL yang sudah ikut ter-cache di /api/berita. Ambil ulang dari
+   upstream setiap kali video benar-benar dibuka. */
+const freshVideoUrl = async (shortCode) => {
+  const upstream = await fetch(UPSTREAM, {
+    headers: { Accept: "application/json", "Cache-Control": "no-cache" },
+  });
+
+  if (!upstream.ok) throw new Error(`upstream status ${upstream.status}`);
+
+  const payload = await upstream.json();
+  const items = Array.isArray(payload.data) ? payload.data : [];
+  const found = items.find((item) => item && item.short_code === shortCode);
+
+  if (!found || !found.is_video || !found.video_url) return "";
+  return String(found.video_url);
+};
+
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ ok: false, error: "method_not_allowed" });
   }
 
-  const raw = Array.isArray(req.query.url) ? req.query.url[0] : req.query.url;
-  if (!raw || !isAllowed(raw)) {
-    return res.status(400).json({ ok: false, error: "url_tidak_diizinkan" });
+  const q = req.query || {};
+  const shortCode = String(Array.isArray(q.id) ? q.id[0] : q.id || "").trim();
+  const raw = String(Array.isArray(q.url) ? q.url[0] : q.url || "").trim();
+
+  if (!shortCode && !raw) {
+    return res.status(400).json({ ok: false, error: "parameter_kosong" });
   }
 
   /* Teruskan Range supaya <video> bisa streaming & di-sek. */
@@ -35,13 +59,28 @@ export default async function handler(req, res) {
   if (range) headers.Range = range;
 
   try {
-    const upstream = await fetch(raw, { headers, redirect: "follow" });
+    const target = shortCode ? await freshVideoUrl(shortCode) : raw;
+
+    if (!target) {
+      return res.status(404).json({
+        ok: false,
+        error: "video_tidak_ditemukan",
+        hint: "pakai embed Instagram",
+      });
+    }
+
+    if (!isAllowed(target)) {
+      return res.status(400).json({ ok: false, error: "url_tidak_diizinkan" });
+    }
+
+    const upstream = await fetch(target, { headers, redirect: "follow" });
 
     if (!upstream.ok && upstream.status !== 206) {
       return res.status(502).json({
         ok: false,
         error: "video_tidak_tersedia",
         status: upstream.status,
+        hint: "URL Instagram kedaluwarsa, pakai embed",
       });
     }
 
@@ -67,7 +106,11 @@ export default async function handler(req, res) {
 
     const body = Buffer.from(await upstream.arrayBuffer());
     return res.end(body);
-  } catch {
-    return res.status(502).json({ ok: false, error: "gagal_mengambil" });
+  } catch (error) {
+    return res.status(502).json({
+      ok: false,
+      error: "gagal_mengambil",
+      detail: String(error.message || error),
+    });
   }
 }
