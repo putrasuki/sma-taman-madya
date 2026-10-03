@@ -1,51 +1,64 @@
-const ALLOWED_HOSTS = ["cdninstagram.com", "fbcdn.net"];
+import {
+  fetchUpstreamItems,
+  findUpstreamByShortCode,
+  isAllowedMediaUrl,
+  streamFromInstagram,
+} from "../lib/ig.js";
 
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
-
-const isAllowed = (raw) => {
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== "https:") return false;
-    const host = u.hostname.toLowerCase();
-    return ALLOWED_HOSTS.some((d) => host === d || host.endsWith(`.${d}`));
-  } catch {
-    return false;
-  }
-};
-
+/* Thumbnail Instagram juga punya URL yang kedaluwarsa, jadi lebih aman dipanggil
+   per shortCode: /api/thumbnail?id=<shortCode>. Parameter ?url= tetap dipakai
+   sebagai cadangan kalau shortCode tidak ada. */
 export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400");
-
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ ok: false, error: "method_not_allowed" });
   }
 
-  const raw = Array.isArray(req.query.url) ? req.query.url[0] : req.query.url;
-  if (!raw || !isAllowed(raw)) {
+  const q = req.query || {};
+  const shortCode = String(Array.isArray(q.id) ? q.id[0] : q.id || "").trim();
+  const rawUrl = String(Array.isArray(q.url) ? q.url[0] : q.url || "").trim();
+
+  if (!shortCode && !rawUrl) {
+    return res.status(400).json({ ok: false, error: "parameter_kosong" });
+  }
+
+  if (rawUrl && !isAllowedMediaUrl(rawUrl)) {
     return res.status(400).json({ ok: false, error: "url_tidak_diizinkan" });
   }
 
-  try {
-    const upstream = await fetch(raw, {
-      headers: { Referer: "https://www.instagram.com/", "User-Agent": UA, Accept: "image/*,*/*;q=0.8" },
-      redirect: "follow",
-    });
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("X-Content-Type-Options", "nosniff");
 
-    const type = (upstream.headers.get("content-type") || "").split(";")[0].trim();
-    if (!upstream.ok || !type.startsWith("image/")) {
-      return res.status(502).json({ ok: false, error: "gambar_tidak_tersedia", status: upstream.status });
+  try {
+    let target = rawUrl;
+
+    if (shortCode) {
+      const found = findUpstreamByShortCode(shortCode, await fetchUpstreamItems());
+      const fresh = found && (found.thumbnail_url || (Array.isArray(found.images) ? found.images[0] : ""));
+
+      if (fresh && isAllowedMediaUrl(fresh)) target = fresh;
     }
 
+    if (!target) {
+      return res.status(404).json({ ok: false, error: "gambar_tidak_ditemukan" });
+    }
+
+    const result = await streamFromInstagram(target, req, res);
+
+    if (result.body) return res.status(result.status).json(result.body);
+
+    const { upstream, type } = result;
     const body = Buffer.from(await upstream.arrayBuffer());
 
     res.setHeader("Content-Type", type);
     res.setHeader("Content-Length", String(body.length));
-    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    res.setHeader("X-Content-Type-Options", "nosniff");
     return res.status(200).send(body);
-  } catch {
-    return res.status(502).json({ ok: false, error: "gagal_mengambil" });
+  } catch (error) {
+    return res.status(502).json({
+      ok: false,
+      error: "gagal_mengambil",
+      detail: String(error.message || error),
+    });
   }
 }

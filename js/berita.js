@@ -57,25 +57,32 @@
       media.setAttribute("aria-label", `Baca berita: ${judul}`);
     }
 
+    /* Thumbnail lewat proxy pakai shortCode supaya proxy ambil URL baru dari
+       upstream (URL Instagram cepat kedaluwarsa). Kalau gagal, turun ke cover. */
+    const img = document.createElement("img");
+    img.alt = judul;
+    img.loading = "lazy";
+    img.decoding = "async";
+
     if (item.thumbnail) {
-      const img = document.createElement("img");
-      img.src = `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
-      img.alt = judul;
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.addEventListener("error", () => {
-        img.src = item.cover || "/img/berita/cover-berita.svg";
-      });
-      media.appendChild(img);
+      img.src = item.shortCode
+        ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
+        : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+
+      img.addEventListener(
+        "error",
+        () => {
+          if (img.src.endsWith(item.cover || "")) return;
+          img.src = item.cover || "/img/berita/cover-berita.svg";
+        },
+        { once: true }
+      );
     } else {
-      const cover = document.createElement("img");
-      cover.className = "berita-cover";
-      cover.src = item.cover || "/img/berita/cover-berita.svg";
-      cover.alt = judul;
-      cover.loading = "lazy";
-      cover.decoding = "async";
-      media.appendChild(cover);
+      img.className = "berita-cover";
+      img.src = item.cover || "/img/berita/cover-berita.svg";
     }
+
+    media.appendChild(img);
 
     if (item.isVideo) {
       const play = document.createElement("span");
@@ -188,11 +195,13 @@
     return fig;
   };
 
-  const setStatus = (message) => {
-    const status = document.querySelector("[data-berita-status]");
-    if (!status) return;
-    status.textContent = message || "";
-    status.hidden = !message;
+  const statusEl = document.querySelector("[data-berita-status]");
+
+  const setStatus = (message, warning = false) => {
+    if (!statusEl) return;
+    statusEl.textContent = message || "";
+    statusEl.hidden = !message;
+    statusEl.classList.toggle("is-warning", Boolean(warning));
   };
 
   const showSkeleton = () => {
@@ -229,6 +238,14 @@
         .filter(Boolean)
         .join(" · ")
     );
+
+    /* Katalog lokal tetap tampil kalau API Instagram sedang bermasalah. */
+    if (meta && meta.upstream === false) {
+      setStatus(
+        `${items.length} berita dari katalog sekolah · Instagram sedang tidak dapat dihubungi`,
+        true
+      );
+    }
   };
 
   const load = (attempt = 0) => {

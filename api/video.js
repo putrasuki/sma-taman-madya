@@ -1,40 +1,14 @@
-const ALLOWED_HOSTS = ["cdninstagram.com", "fbcdn.net"];
+import {
+  fetchUpstreamItems,
+  findUpstreamByShortCode,
+  isAllowedMediaUrl,
+  streamFromInstagram,
+} from "../lib/ig.js";
 
-const UPSTREAM =
-  "https://api-ig-ruddy.vercel.app/api/berita/sekolah/tamanmadyajetisyogya1956";
-
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
-
-const isAllowed = (raw) => {
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== "https:") return false;
-    const host = u.hostname.toLowerCase();
-    return ALLOWED_HOSTS.some((d) => host === d || host.endsWith(`.${d}`));
-  } catch {
-    return false;
-  }
-};
-
-/* URL mp4 Instagram hanya berlaku beberapa jam (parameter `oe`), jadi jangan
-  andalkan URL yang sudah ikut ter-cache di /api/berita. Ambil ulang dari
-   upstream setiap kali video benar-benar dibuka. */
-const freshVideoUrl = async (shortCode) => {
-  const upstream = await fetch(UPSTREAM, {
-    headers: { Accept: "application/json", "Cache-Control": "no-cache" },
-  });
-
-  if (!upstream.ok) throw new Error(`upstream status ${upstream.status}`);
-
-  const payload = await upstream.json();
-  const items = Array.isArray(payload.data) ? payload.data : [];
-  const found = items.find((item) => item && item.short_code === shortCode);
-
-  if (!found || !found.is_video || !found.video_url) return "";
-  return String(found.video_url);
-};
-
+/* Video: dipanggil per shortCode (/api/video?id=<shortCode>) supaya URL mp4
+   Instagram diambil ulang setiap kali dibuka — URL itu hanya berlaku beberapa jam
+   sehingga 403/502 kalau dipakai dari cache. Kalau tetap gagal, halaman detail
+   otomatis jatuh ke embed Instagram. */
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
@@ -43,23 +17,30 @@ export default async function handler(req, res) {
 
   const q = req.query || {};
   const shortCode = String(Array.isArray(q.id) ? q.id[0] : q.id || "").trim();
-  const raw = String(Array.isArray(q.url) ? q.url[0] : q.url || "").trim();
+  const rawUrl = String(Array.isArray(q.url) ? q.url[0] : q.url || "").trim();
 
-  if (!shortCode && !raw) {
+  if (!shortCode && !rawUrl) {
     return res.status(400).json({ ok: false, error: "parameter_kosong" });
   }
 
-  /* Teruskan Range supaya <video> bisa streaming & di-sek. */
-  const headers = {
-    Referer: "https://www.instagram.com/",
-    "User-Agent": UA,
-    Accept: "video/*,*/*;q=0.8",
-  };
-  const range = req.headers.range;
-  if (range) headers.Range = range;
+  if (rawUrl && !isAllowedMediaUrl(rawUrl)) {
+    return res.status(400).json({ ok: false, error: "url_tidak_diizinkan" });
+  }
+
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=3600");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Accept-Ranges", "bytes");
 
   try {
-    const target = shortCode ? await freshVideoUrl(shortCode) : raw;
+    let target = rawUrl;
+
+    if (shortCode) {
+      const found = findUpstreamByShortCode(shortCode, await fetchUpstreamItems());
+      const fresh = found && found.is_video ? found.video_url : "";
+
+      if (fresh && isAllowedMediaUrl(fresh)) target = fresh;
+    }
 
     if (!target) {
       return res.status(404).json({
@@ -69,38 +50,18 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!isAllowed(target)) {
-      return res.status(400).json({ ok: false, error: "url_tidak_diizinkan" });
-    }
+    const result = await streamFromInstagram(target, req, res);
 
-    const upstream = await fetch(target, { headers, redirect: "follow" });
+    if (result.body) return res.status(result.status).json(result.body);
 
-    if (!upstream.ok && upstream.status !== 206) {
-      return res.status(502).json({
-        ok: false,
-        error: "video_tidak_tersedia",
-        status: upstream.status,
-        hint: "URL Instagram kedaluwarsa, pakai embed",
-      });
-    }
-
-    const type = (upstream.headers.get("content-type") || "").split(";")[0].trim();
+    const { upstream, type } = result;
     const length = upstream.headers.get("content-length");
     const contentRange = upstream.headers.get("content-range");
 
-    /* Jaga-jaga: jangan pernah kirim HTML/JSON pretending video. */
-    if (!type.startsWith("video/") && !type.startsWith("application/octet-stream")) {
-      return res.status(502).json({ ok: false, error: "tipe_bukan_video", type });
-    }
-
-    res.status(upstream.status);
+    res.status(result.status);
     res.setHeader("Content-Type", type);
     if (length) res.setHeader("Content-Length", length);
     if (contentRange) res.setHeader("Content-Range", contentRange);
-    res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=3600");
-    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    res.setHeader("X-Content-Type-Options", "nosniff");
 
     if (req.method === "HEAD") return res.end();
 

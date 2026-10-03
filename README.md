@@ -39,6 +39,31 @@ merender semuanya; tidak ada batas jumlah kartu. Selama dimuat muncul skeleton
 shimmer, dengan percobaan ulang otomatis 3×; kalau tetap gagal muncul kartu error
 beserta tombol "Muat ulang".
 
+### Men-debug berita
+
+Semualogika proxy Instagram ada di satu tempat: `lib/ig.js` (URL upstream, validasi
+host CDN, fetch ulang tanpa cache, streaming + penerusan `Range`). Kalau nanti ada
+error media, perbaiki di sana — `api/berita.js`, `api/thumbnail.js`, dan
+`api/video.js` cuma memakai helper itu.
+
+| Gejala | Penyebab | Perbaikan |
+| --- | --- | --- |
+| Kartu tidak muncul | `/api/berita` tidak mengembalikan `items` | cek `https://sma-taman-madya.vercel.app/api/berita` di browser; katalog lokal (`data/berita.json`) tetap tampil walau Instagram mati |
+| Kartu muncul, gambar kosong | URL thumbnail Instagram 403 | `api/thumbnail.js` sudah mengambil URL baru per shortCode; kalau tetap gagal kartu jatuh ke `img/berita/cover-<kategori>.svg` |
+| Video tidak diputar | URL mp4 Instagram 403 (butuh login/signature) | halaman detail otomatis ganti ke embed `instagram.com/p/<shortCode>/embed/captioned/` |
+| "Instagram sedang tidak dapat dihubungi" | upstream sedang mati | wajar, katalog lokal tetap tampil |
+
+Kode status yang dipakai proxy: `200` streaming, `400` parameter tidak diizinkan,
+`404` shortCode tidak ada, `502` media Instagram tidak bisa diambil (klien sudah
+menyiapkan fallback).
+
+Cek cepat tanpa server:
+
+```bash
+node --check api/berita.js
+node -e "import('./api/berita.js').then(m=>console.log(Object.keys(m)))"
+```
+
 `api/berita.js` menggabungkan dua sumber:
 
 1. **API Instagram** (`api-ig-ruddy.vercel.app`) — dipakai untuk thumbnail, jumlah suka,

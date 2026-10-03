@@ -1,7 +1,11 @@
-const KATALOG = require("../data/berita.json");
+import { createRequire } from "node:module";
 
-const UPSTREAM =
-  "https://api-ig-ruddy.vercel.app/api/berita/sekolah/tamanmadyajetisyogya1956";
+import { fetchUpstreamItems } from "../lib/ig.js";
+
+/* createRequire supaya data/berita.json bisa dibaca tanpa 지원 import JSON
+   khusus di bundler Vercel. */
+const require = createRequire(import.meta.url);
+const KATALOG = require("../data/berita.json");
 
 const CACHE_SECONDS = 60 * 30;
 
@@ -75,7 +79,7 @@ function gabung(apiItems) {
   );
 }
 
-module.exports = async function handler(req, res) {
+const handler = async (req, res) => {
   const okCache = `s-maxage=${CACHE_SECONDS}, stale-while-revalidate=86400`;
 
   /* Respons gagal tidak boleh di-cache CDN, supaya pengunjung berikutnya
@@ -86,24 +90,30 @@ module.exports = async function handler(req, res) {
     return res.status(status).json(body);
   };
 
+  /* Kalau upstream mati, katalog lokal tetap bisa ditampilkan — lebih baik
+     daripada kartu error kosong. */
+  const dariKatalogSaja = () => gabung([]);
+
   try {
-    const upstream = await fetch(UPSTREAM, {
-      headers: { Accept: "application/json" },
-    });
+    let items;
+    let upstreamOk = true;
 
-    if (!upstream.ok) {
-      throw new Error(`upstream status ${upstream.status}`);
+    try {
+      const mentah = await fetchUpstreamItems();
+      items = gabung(mentah.map(normalise));
+      upstreamOk = items.length > 0;
+    } catch (error) {
+      upstreamOk = false;
+      items = dariKatalogSaja();
+      process.stderr.write(`[api/berita] upstream gagal: ${error.message}\n`);
     }
-
-    const payload = await upstream.json();
-    const items = gabung((Array.isArray(payload.data) ? payload.data : []).map(normalise));
 
     if (!items.length) {
       return send(
         200,
         {
           ok: false,
-          error: "upstream_kosong",
+          error: "tidak_ada_berita",
           updatedAt: new Date().toISOString(),
           items: [],
           item: null,
@@ -133,6 +143,7 @@ module.exports = async function handler(req, res) {
         200,
         {
           ok: true,
+          upstream: upstreamOk,
           updatedAt: new Date().toISOString(),
           item: found,
           prev: position > 0 ? items[position - 1] : null,
@@ -148,6 +159,7 @@ module.exports = async function handler(req, res) {
       200,
       {
         ok: true,
+        upstream: upstreamOk,
         updatedAt: new Date().toISOString(),
         total: items.length,
         dariApi: items.filter((item) => item.sumber === "api").length,
@@ -169,3 +181,5 @@ module.exports = async function handler(req, res) {
     );
   }
 };
+
+export default handler;

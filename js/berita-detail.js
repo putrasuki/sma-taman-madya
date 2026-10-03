@@ -58,11 +58,16 @@
     );
   };
 
+  const coverOf = (item) => item.cover || "/img/berita/cover-berita.svg";
+
+  /* Thumbnail lewat proxy pakai shortCode supaya proxy mengambil URL baru dari
+     upstream (URL Instagram cepat kedaluwarsa). Kalau tidak ada shortCode,
+     jatuh ke parameter url; kalau gagal semua, turun ke cover kategori. */
   const thumbUrl = (item) => {
-    const cover = item.cover || "/img/berita/cover-berita.svg";
-    return item.thumbnail
-      ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
-      : cover;
+    if (!item.thumbnail) return coverOf(item);
+    return item.shortCode
+      ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
+      : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
   };
 
   /* Proxy video lebih aman kalau dipanggil per shortCode: /api/video?id=...
@@ -194,7 +199,7 @@
       imageEl.addEventListener(
         "error",
         () => {
-          imageEl.src = item.cover || "/img/berita/cover-berita.svg";
+          imageEl.src = coverOf(item);
         },
         { once: true }
       );
