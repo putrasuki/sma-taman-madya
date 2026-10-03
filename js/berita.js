@@ -2,6 +2,14 @@
   "use strict";
 
   const ENDPOINT = "/api/berita";
+  const INSTAGRAM_URL = "https://www.instagram.com/tamanmadyajetisyogya1956/";
+  const LOCAL_HINT =
+    "Feed berita diambil dari /api/berita. Untuk mencoba di komputer, jalankan `npx vercel dev` — atau cek versi live di sma-taman-madya.vercel.app.";
+
+  const isLocalPreview = () =>
+    window.location.protocol === "file:" ||
+    /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+
   const grid = document.querySelector("[data-berita-grid]");
   if (!grid) return;
 
@@ -114,7 +122,7 @@
     return fig;
   };
 
-  const createError = (message, onRetry) => {
+  const createError = (message, onRetry, hint) => {
     const fig = document.createElement("article");
     fig.className = "berita-card berita-error";
 
@@ -128,16 +136,33 @@
     para.className = "berita-excerpt";
     para.textContent = message;
 
+    body.append(heading, para);
+
+    if (hint) {
+      const note = document.createElement("p");
+      note.className = "berita-hint";
+      note.textContent = hint;
+      body.appendChild(note);
+    }
+
     const actions = document.createElement("p");
     actions.className = "berita-actions";
+
     const retry = document.createElement("button");
     retry.type = "button";
     retry.className = "btn btn-ghost btn-sm";
     retry.textContent = "Muat ulang";
     retry.addEventListener("click", onRetry);
-    actions.appendChild(retry);
 
-    body.append(heading, para, actions);
+    const ig = document.createElement("a");
+    ig.className = "btn btn-ghost btn-sm";
+    ig.href = INSTAGRAM_URL;
+    ig.target = "_blank";
+    ig.rel = "noopener noreferrer";
+    ig.textContent = "Buka Instagram";
+
+    actions.append(retry, ig);
+    body.appendChild(actions);
     fig.appendChild(body);
     return fig;
   };
@@ -156,8 +181,8 @@
     grid.classList.add("is-loading");
   };
 
-  const showError = (message, onRetry) => {
-    grid.replaceChildren(createError(message, onRetry));
+  const showError = (message, onRetry, hint) => {
+    grid.replaceChildren(createError(message, onRetry, hint));
     grid.classList.remove("is-loading");
   };
 
@@ -191,17 +216,21 @@
           return;
         }
         const reason =
-          (payload && payload.error && `(${payload.error})`) || "";
+          (payload && payload.error && ` (${payload.error})`) || "";
         showError(
           `Kabar terbaru belum bisa diambil dari server${reason}. Coba lagi sebentar lagi.`,
-          load
+          load,
+          LOCAL_HINT
         );
         setStatus("Berita gagal dimuat.");
       })
       .catch(() => {
         showError(
-          "Kabar terbaru belum bisa diambil dari server. Periksa koneksi Anda lalu coba lagi.",
-          load
+          isLocalPreview()
+            ? "Halaman ini dibuka tanpa server, jadi /api/berita tidak tersedia."
+            : "Kabar terbaru belum bisa diambil dari server. Periksa koneksi Anda lalu coba lagi.",
+          load,
+          LOCAL_HINT
         );
         setStatus("Berita gagal dimuat.");
       });

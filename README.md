@@ -38,4 +38,15 @@ beserta tombol "Muat ulang".
 `img/berita/berita-1.jpg` hanya dipakai sebagai gambar cadangan kalau `/api/thumbnail`
 gagal mengembalikan thumbnail.
 
+Feed berita butuh fungsi server `api/berita.js`, jadi saat mencoba lokal harus memakai
+server Vercel (CLI sudah terpasang):
+
+```bash
+npx vercel dev
+```
+
+Kalau hanya/static server biasa (atau `file://`), section berita menampilkan kartu
+error: "Halaman ini dibuka tanpa server, jadi /api/berita tidak tersedia." beserta
+tombol "Muat ulang" dan tautan Instagram.
+
 > Catatan: 4 gambar di section galeri masih placeholder, di-inline sebagai `data:` URI di dalam `index.html`. Ganti dengan foto asli kalau sudah tersedia.
