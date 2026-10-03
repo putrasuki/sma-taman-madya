@@ -1,5 +1,5 @@
 /* ============================================================
-   SMA Taman Madya Jetis â€” style.css
+   SMA Taman Madya Jetis — style.css
    Mobile-first. Design tokens via custom properties.
    ============================================================ */
 
@@ -145,6 +145,8 @@ address { font-style: normal; }
 
 .section-head { max-width: 46rem; margin-bottom: var(--sp-7); }
 
+.grid-3 { display: grid; gap: var(--sp-4); }
+
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -155,13 +157,6 @@ address { font-style: normal; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.eyebrow .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold-500);
 }
 
 h1,
@@ -675,13 +670,13 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 .to-top:hover { background: var(--green-800); color: #fff; border-color: var(--green-800); }
 
 /* ---------- 19. Scroll reveal ---------- */
-.reveal {
+.js .reveal {
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 500ms var(--ease), transform 500ms var(--ease);
 }
 
-.reveal.is-visible {
+.js .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
@@ -1041,4 +1036,9 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 
   body { color: #000; }
   .section { padding-block: var(--sp-5); }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
