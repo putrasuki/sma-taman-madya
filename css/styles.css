@@ -493,24 +493,27 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 }
 
 /* ---------- 11. Facility grid ---------- */
-.facility-grid {
+.facility-gallery {
   display: grid;
   gap: var(--sp-3);
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(2, 1fr);
 }
 
-.facility-grid li {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
-  background: #fff;
-  border: 1px solid var(--line);
+.facility-item {
+  overflow: hidden;
   border-radius: var(--radius);
-  font-weight: 500;
+  background: var(--green-100);
 }
 
-.facility-grid span { font-size: 1.35rem; }
+.facility-item img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  transition: transform 400ms var(--ease);
+}
+
+.facility-item:hover img { transform: scale(1.04); }
 
 /* ---------- 12. Gallery ---------- */
 .gallery {
@@ -1027,8 +1030,10 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 }
 
 @media (min-width: 64rem) {
-  .facility-grid { grid-template-columns: repeat(4, 1fr); }
+  .facility-gallery { grid-template-columns: repeat(3, 1fr); }
 
+  .facility-item-wide { grid-column: span 3; }
+  .facility-item-wide img { aspect-ratio: 21 / 9; }
 }
 
 /* ---------- 21. Print ---------- */
