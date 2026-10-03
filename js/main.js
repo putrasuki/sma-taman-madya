@@ -109,5 +109,69 @@
     sections.forEach((section) => spy.observe(section));
   }
 
+  /* ---------- Facility gallery filter (satu tab = satu folder) ---------- */
+  const facilityTabs = Array.from(
+    document.querySelectorAll("[data-facility-tabs] [role='tab']")
+  );
+  const facilityItems = Array.from(
+    document.querySelectorAll("[data-facility-grid] .facility-item")
+  );
+  const facilityStatus = document.querySelector("[data-facility-status]");
+  const facilityPanel = document.getElementById("facility-panel");
+
+  if (facilityTabs.length && facilityItems.length) {
+    const select = (tab) => {
+      const filter = tab.dataset.facilityFilter;
+
+      facilityTabs.forEach((item) => {
+        const active = item === tab;
+        item.setAttribute("aria-selected", String(active));
+        item.tabIndex = active ? 0 : -1;
+      });
+
+      let shown = 0;
+
+      facilityItems.forEach((item) => {
+        const match = filter === "all" || item.dataset.facility === filter;
+        item.hidden = !match;
+        if (!match) return;
+        shown += 1;
+        item.classList.add("is-visible");
+      });
+
+      if (facilityPanel) facilityPanel.setAttribute("aria-labelledby", tab.id);
+
+      if (facilityStatus) {
+        const label = tab.dataset.facilityLabel || "fasilitas";
+        facilityStatus.textContent = `Menampilkan ${shown} foto ${label}.`;
+      }
+    };
+
+    facilityTabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => select(tab));
+
+      tab.addEventListener("keydown", (event) => {
+        let next;
+
+        if (event.key === "ArrowRight") next = index + 1;
+        else if (event.key === "ArrowLeft") next = index - 1;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = facilityTabs.length - 1;
+        else return;
+
+        event.preventDefault();
+
+        const target = facilityTabs[(next + facilityTabs.length) % facilityTabs.length];
+        select(target);
+        target.focus();
+      });
+    });
+
+    const initial =
+      facilityTabs.find((tab) => tab.getAttribute("aria-selected") === "true") ||
+      facilityTabs[0];
+
+    select(initial);
+  }
 
 })();

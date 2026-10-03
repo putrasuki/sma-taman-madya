@@ -216,57 +216,166 @@
         <h2>Galeri fasilitas sekolah</h2>
         <p class="section-lead">
           Ruang belajar dan sarana pendukung yang kami sediakan untuk siswa,
-          dari laboratorium hingga lapangan olahraga.
+          dari laboratorium hingga lapangan olahraga. Pilih kategori di bawah
+          untuk melihat foto per sudut sekolah.
         </p>
       </header>
 
-      <ul class="facility-gallery">
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/ruang-kelas/ruang-kelas.jpg"
-               width="1200" height="676"
-               alt="Ruang kelas SMA Taman Madya Jetis dengan penataan tempat belajar siswa." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/ruang-kelas/ruang-kelas-2.jpg"
-               width="1200" height="676"
-               alt="Sudut lain ruang kelas dengan layar proyektor dan meja siswa." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/lab-komputer/lab-komputer.jpg"
-               width="1200" height="676"
-               alt="Laboratorium komputer dan robotika dengan workstation untuk setiap siswa." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/lab-sains/praktik-fisika.jpg"
-               width="1200" height="686"
-               alt="Kegiatan praktikum fisika menggunakan alat praktik di laboratorium sekolah." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/lab-sains/praktik-biologi.jpg"
-               width="1200" height="681"
-               alt="Kegiatan praktikum biologi dengan alat praktik dan mikroskop di laboratorium." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/perpustakaan/perpustakaan.jpg"
-               width="1200" height="676"
-               alt="Perpustakaan sekolah dengan rak buku dan ruang baca siswa." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/aula/aula.jpg"
-               width="1200" height="676"
-               alt="Ruang aula sekolah untuk kegiatan besar dan acara sekolah." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item reveal">
-          <img src="img/fasilitas/kegiatan/kegiatan.jpg"
-               width="1200" height="678"
-               alt="Suasana kegiatan belajar bersama siswa di sekolah." loading="lazy" decoding="async">
-        </li>
-        <li class="facility-item facility-item-wide reveal">
-          <img src="img/fasilitas/kegiatan/kegiatan-praktek.jpg"
-               width="1200" height="682"
-               alt="Siswa mengikuti kegiatan praktik langsung di lingkungan sekolah." loading="lazy" decoding="async">
-        </li>
-      </ul>
+      <!-- Satu tab = satu folder di img/fasilitas. Tanpa JS semua tab disembunyikan
+           dan seluruh foto tetap tampil. -->
+      <div class="facility-tabs" role="tablist" aria-label="Kategori fasilitas" data-facility-tabs>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-all"
+                aria-selected="true" aria-controls="facility-panel"
+                data-facility-filter="all" data-facility-label="semua fasilitas">
+          Semua<span class="facility-tab-count" aria-hidden="true">9</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-ruang-kelas"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="ruang-kelas" data-facility-label="ruang kelas">
+          Ruang Kelas<span class="facility-tab-count" aria-hidden="true">2</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-lab-komputer"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="lab-komputer" data-facility-label="lab komputer">
+          Lab Komputer<span class="facility-tab-count" aria-hidden="true">1</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-lab-sains"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="lab-sains" data-facility-label="lab sains">
+          Lab Sains<span class="facility-tab-count" aria-hidden="true">2</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-perpustakaan"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="perpustakaan" data-facility-label="perpustakaan">
+          Perpustakaan<span class="facility-tab-count" aria-hidden="true">1</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-aula"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="aula" data-facility-label="aula">
+          Aula<span class="facility-tab-count" aria-hidden="true">1</span>
+        </button>
+        <button type="button" class="facility-tab" role="tab" id="facility-tab-kegiatan"
+                aria-selected="false" aria-controls="facility-panel" tabindex="-1"
+                data-facility-filter="kegiatan" data-facility-label="kegiatan sekolah">
+          Kegiatan<span class="facility-tab-count" aria-hidden="true">2</span>
+        </button>
+      </div>
+
+      <p class="facility-status" role="status" data-facility-status></p>
+
+      <div class="facility-panel" id="facility-panel" role="tabpanel"
+           aria-labelledby="facility-tab-all" tabindex="0">
+        <ul class="facility-gallery" data-facility-grid>
+          <li class="facility-item reveal" data-facility="ruang-kelas">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/ruang-kelas/ruang-kelas.jpg"
+                   width="1200" height="676"
+                   alt="Ruang kelas SMA Taman Madya Jetis dengan penataan tempat belajar siswa."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Ruang kelas utama</span>
+                <span class="facility-tag">Ruang Kelas</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="ruang-kelas">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/ruang-kelas/ruang-kelas-2.jpg"
+                   width="1200" height="676"
+                   alt="Sudut lain ruang kelas dengan layar proyektor dan meja siswa."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Sudut belajar siswa</span>
+                <span class="facility-tag">Ruang Kelas</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="lab-komputer">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/lab-komputer/lab-komputer.jpg"
+                   width="1200" height="676"
+                   alt="Laboratorium komputer dan robotika dengan workstation untuk setiap siswa."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Laboratorium komputer &amp; robotika</span>
+                <span class="facility-tag">Lab Komputer</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="lab-sains">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/lab-sains/praktik-fisika.jpg"
+                   width="1200" height="686"
+                   alt="Kegiatan praktikum fisika menggunakan alat praktik di laboratorium sekolah."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Praktikum fisika</span>
+                <span class="facility-tag">Lab Sains</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="lab-sains">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/lab-sains/praktik-biologi.jpg"
+                   width="1200" height="681"
+                   alt="Kegiatan praktikum biologi dengan alat praktik dan mikroskop di laboratorium."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Praktikum biologi</span>
+                <span class="facility-tag">Lab Sains</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="perpustakaan">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/perpustakaan/perpustakaan.jpg"
+                   width="1200" height="676"
+                   alt="Perpustakaan sekolah dengan rak buku dan ruang baca siswa."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Perpustakaan sekolah</span>
+                <span class="facility-tag">Perpustakaan</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="aula">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/aula/aula.jpg"
+                   width="1200" height="676"
+                   alt="Ruang aula sekolah untuk kegiatan besar dan acara sekolah."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Ruang aula</span>
+                <span class="facility-tag">Aula</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="kegiatan">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/kegiatan/kegiatan.jpg"
+                   width="1200" height="678"
+                   alt="Suasana kegiatan belajar bersama siswa di sekolah."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Kegiatan belajar bersama</span>
+                <span class="facility-tag">Kegiatan</span>
+              </figcaption>
+            </figure>
+          </li>
+          <li class="facility-item reveal" data-facility="kegiatan">
+            <figure class="facility-figure">
+              <img src="img/fasilitas/kegiatan/kegiatan-praktek.jpg"
+                   width="1200" height="682"
+                   alt="Siswa mengikuti kegiatan praktik langsung di lingkungan sekolah."
+                   loading="lazy" decoding="async">
+              <figcaption class="facility-caption">
+                <span class="facility-name">Praktik langsung di lapangan</span>
+                <span class="facility-tag">Kegiatan</span>
+              </figcaption>
+            </figure>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
