@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800" role="img" aria-label="Kebudayaan  sekolah">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a2a6b"/>
+      <stop offset="1" stop-color="#9a4fb0"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="800" fill="url(#g)"/>
+  <g fill="#ffffff" opacity="0.14">
+    <circle cx="500" cy="180" r="150"/>
+    <circle cx="120" cy="640" r="190"/>
+  </g>
+  <text x="320" y="392" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#ffffff">Kebudayaan</text>
+  <text x="320" y="452" text-anchor="middle" font-family="system-ui, sans-serif" font-size="30" fill="#ffffff" opacity="0.85"> sekolah</text>
+  <text x="320" y="726" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#ffffff" opacity="0.75">SMA Taman Madya Jetis</text>
+</svg>

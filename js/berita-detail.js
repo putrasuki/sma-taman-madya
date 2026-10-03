@@ -58,8 +58,12 @@
     );
   };
 
-  const thumbUrl = (src) =>
-    src ? `/api/thumbnail?url=${encodeURIComponent(src)}` : "/img/berita/berita-1.jpg";
+  const thumbUrl = (item) => {
+    const cover = item.cover || "/img/berita/cover-berita.svg";
+    return item.thumbnail
+      ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
+      : cover;
+  };
 
   const videoProxyUrl = (src) => `/api/video?url=${encodeURIComponent(src)}`;
 
@@ -131,9 +135,9 @@
       .filter(Boolean)
       .join(" · ");
 
-    titleEl.textContent = shortTitle(item.text);
+    titleEl.textContent = item.judulKurasi || shortTitle(item.text);
 
-    const poster = thumbUrl(item.thumbnail);
+    const poster = thumbUrl(item);
 
     /* Video: pakai <video> kalau ada sumbernya, kalau tidak tetap gambar. */
     if (item.isVideo && item.videoUrl) {
@@ -154,9 +158,9 @@
       videoEl.removeAttribute("src");
       imageEl.hidden = false;
       imageEl.src = poster;
-      imageEl.alt = shortTitle(item.text);
+      imageEl.alt = item.judulKurasi || shortTitle(item.text);
       imageEl.addEventListener("error", () => {
-        imageEl.src = "/img/berita/berita-1.jpg";
+        imageEl.src = item.cover || "/img/berita/cover-berita.svg";
       }, { once: true });
     }
 

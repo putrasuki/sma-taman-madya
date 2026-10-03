@@ -42,28 +42,40 @@
 
   const createCard = (item) => {
     const { title, excerpt } = splitCaption(item.text);
+    const judul = item.judulKurasi || title;
     const fig = document.createElement("article");
     fig.className = "berita-card reveal is-visible";
 
-    const media = document.createElement("a");
-    media.className = "berita-media";
-    media.href = `berita.html?id=${encodeURIComponent(item.shortCode)}`;
-    media.setAttribute(
-      "aria-label",
-      `Baca berita: ${title}`
-    );
+    const detailUrl = item.shortCode
+      ? `berita.html?id=${encodeURIComponent(item.shortCode)}`
+      : item.postUrl;
 
-    const img = document.createElement("img");
-    img.src = item.thumbnail
-      ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
-      : "/img/berita/berita-1.jpg";
-    img.alt = title;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.addEventListener("error", () => {
-      img.src = "/img/berita/berita-1.jpg";
-    });
-    media.appendChild(img);
+    const media = document.createElement(detailUrl ? "a" : "div");
+    media.className = "berita-media";
+    if (detailUrl) {
+      media.href = detailUrl;
+      media.setAttribute("aria-label", `Baca berita: ${judul}`);
+    }
+
+    if (item.thumbnail) {
+      const img = document.createElement("img");
+      img.src = `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+      img.alt = judul;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.addEventListener("error", () => {
+        img.src = item.cover || "/img/berita/cover-berita.svg";
+      });
+      media.appendChild(img);
+    } else {
+      const cover = document.createElement("img");
+      cover.className = "berita-cover";
+      cover.src = item.cover || "/img/berita/cover-berita.svg";
+      cover.alt = judul;
+      cover.loading = "lazy";
+      cover.decoding = "async";
+      media.appendChild(cover);
+    }
 
     if (item.isVideo) {
       const play = document.createElement("span");
@@ -74,6 +86,13 @@
       media.appendChild(play);
     }
 
+    if (item.kategoriLabel) {
+      const badge = document.createElement("span");
+      badge.className = "berita-badge";
+      badge.textContent = item.kategoriLabel;
+      media.appendChild(badge);
+    }
+
     fig.appendChild(media);
 
     const body = document.createElement("div");
@@ -82,7 +101,7 @@
     const meta = document.createElement("p");
     meta.className = "berita-meta";
     meta.textContent = [
-      item.isVideo ? "Video" : "Foto",
+      item.type === "info" ? "Info" : item.isVideo ? "Video" : "Foto",
       formatDate(item.postedAt),
       item.likes ? `${formatLikes(item.likes)} suka` : "",
     ]
@@ -91,10 +110,10 @@
     body.appendChild(meta);
 
     const heading = document.createElement("h3");
-    heading.textContent = title;
+    heading.textContent = judul;
     body.appendChild(heading);
 
-    if (excerpt) {
+    if (excerpt && excerpt !== judul) {
       const para = document.createElement("p");
       para.className = "berita-excerpt";
       para.textContent = excerpt;
@@ -193,7 +212,7 @@
     window.setTimeout(() => load(attempt + 1), delay);
   };
 
-  const render = (items, updatedAt) => {
+  const render = (items, meta) => {
     const fragment = document.createDocumentFragment();
     items.forEach((item) => fragment.appendChild(createCard(item)));
     grid.replaceChildren(fragment);
@@ -202,9 +221,10 @@
     const terbaru = items.length ? formatDate(items[0].postedAt) : "";
     setStatus(
       [
-        `${items.length} berita dari Instagram`,
+        `${items.length} berita`,
         terbaru ? `terbaru ${terbaru}` : "",
-        updatedAt ? `diperbarui ${formatDate(updatedAt)}` : "",
+        meta && meta.dariKatalog ? `${meta.dariKatalog} dari katalog sekolah` : "",
+        meta && meta.updatedAt ? `diperbarui ${formatDate(meta.updatedAt)}` : "",
       ]
         .filter(Boolean)
         .join(" · ")
@@ -227,7 +247,7 @@
       .then((res) => res.json())
       .then((payload) => {
         if (payload && payload.ok && payload.items.length) {
-          render(payload.items, payload.updatedAt);
+          render(payload.items, payload);
           return;
         }
 
