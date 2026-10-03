@@ -95,29 +95,116 @@
     return fig;
   };
 
-  const showFallback = () => {
-    grid.classList.remove("is-loading");
-    grid.classList.add("is-fallback");
-    grid.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => {
-      el.classList.add("is-visible");
-    });
+  const createSkeleton = () => {
+    const fig = document.createElement("article");
+    fig.className = "berita-card berita-skeleton";
+    fig.setAttribute("aria-hidden", "true");
+
+    const media = document.createElement("span");
+    media.className = "berita-media";
+
+    const lines = document.createElement("span");
+    lines.className = "berita-skeleton-lines";
+    lines.append(
+      Object.assign(document.createElement("span"), { className: "berita-skeleton-line" }),
+      Object.assign(document.createElement("span"), { className: "berita-skeleton-line" })
+    );
+
+    fig.append(media, lines);
+    return fig;
   };
 
-  const render = (items) => {
+  const createError = (message, onRetry) => {
+    const fig = document.createElement("article");
+    fig.className = "berita-card berita-error";
+
+    const body = document.createElement("div");
+    body.className = "berita-body";
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Berita belum bisa dimuat";
+
+    const para = document.createElement("p");
+    para.className = "berita-excerpt";
+    para.textContent = message;
+
+    const actions = document.createElement("p");
+    actions.className = "berita-actions";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "btn btn-ghost btn-sm";
+    retry.textContent = "Muat ulang";
+    retry.addEventListener("click", onRetry);
+    actions.appendChild(retry);
+
+    body.append(heading, para, actions);
+    fig.appendChild(body);
+    return fig;
+  };
+
+  const setStatus = (message) => {
+    const status = document.querySelector("[data-berita-status]");
+    if (!status) return;
+    status.textContent = message || "";
+    status.hidden = !message;
+  };
+
+  const showSkeleton = () => {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < 3; i += 1) fragment.appendChild(createSkeleton());
+    grid.replaceChildren(fragment);
+    grid.classList.add("is-loading");
+  };
+
+  const showError = (message, onRetry) => {
+    grid.replaceChildren(createError(message, onRetry));
+    grid.classList.remove("is-loading");
+  };
+
+  const render = (items, updatedAt) => {
     const fragment = document.createDocumentFragment();
     items.forEach((item) => fragment.appendChild(createCard(item)));
     grid.replaceChildren(fragment);
-    grid.classList.remove("is-loading", "is-fallback");
+    grid.classList.remove("is-loading");
+
+    const terbaru = items.length ? formatDate(items[0].postedAt) : "";
+    setStatus(
+      [
+        `${items.length} berita dari Instagram`,
+        terbaru ? `terbaru ${terbaru}` : "",
+        updatedAt ? `diperbarui ${formatDate(updatedAt)}` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    );
   };
 
   const load = () => {
+    showSkeleton();
+    setStatus("");
+
     fetch(ENDPOINT, { headers: { Accept: "application/json" } })
       .then((res) => res.json())
       .then((payload) => {
-        if (payload && payload.ok && payload.items.length) render(payload.items);
-        else showFallback();
+        if (payload && payload.ok && payload.items.length) {
+          render(payload.items, payload.updatedAt);
+          return;
+        }
+        const reason =
+          (payload && payload.error && `(${payload.error})`) || "";
+        showError(
+          `Kabar terbaru belum bisa diambil dari server${reason}. Coba lagi sebentar lagi.`,
+          load
+        );
+        setStatus("Berita gagal dimuat.");
       })
-      .catch(showFallback);
+      .catch(() => {
+        showError(
+          "Kabar terbaru belum bisa diambil dari server. Periksa koneksi Anda lalu coba lagi.",
+          load
+        );
+        setStatus("Berita gagal dimuat.");
+      });
   };
 
   load();

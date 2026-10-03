@@ -30,11 +30,12 @@ Vercel otomatis redeploy setiap kali ada push ke branch `main`.
 
 ## Berita
 
-`index.html` memuat 6 kartu berita statis sebagai fallback. Di server, `js/berita.js`
-menggantinya dengan data terbaru dari `api/berita.js` (proxy Instagram).
+Kartu berita **tidak disimpan di HTML**. `js/berita.js` mengambil data terbaru dari
+`api/berita.js` (proxy ke API Instagram) dan merender semuanya; tidak ada batas jumlah
+kartu. Selama dimuat, muncul skeleton shimmer; kalau API gagal, muncul pesan error
+beserta tombol "Muat ulang".
 
-Kalau fallback perlu disegarkan: unduh thumbnail terbaru lewat
-`/api/thumbnail?url=<thumbnail_url>` ke `img/berita/berita-N.jpg`, lalu perbarui
-judul, tanggal, jumlah suka, dan `?id=<shortCode>` di `index.html`.
+`img/berita/berita-1.jpg` hanya dipakai sebagai gambar cadangan kalau `/api/thumbnail`
+gagal mengembalikan thumbnail.
 
 > Catatan: 4 gambar di section galeri masih placeholder, di-inline sebagai `data:` URI di dalam `index.html`. Ganti dengan foto asli kalau sudah tersedia.

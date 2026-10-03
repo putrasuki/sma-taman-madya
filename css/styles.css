@@ -889,7 +889,47 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
   font-size: var(--step--1);
 }
 
-.berita-grid.is-loading .berita-card { opacity: 0.55; }
+.berita-grid.is-loading .berita-card:not(.berita-skeleton) { opacity: 0.55; }
+
+/* Skeleton saat /api/berita dimuat */
+.berita-skeleton { border-style: dashed; }
+
+.berita-skeleton .berita-media {
+  background: linear-gradient(100deg, var(--green-050) 30%, #fff 50%, var(--green-050) 70%);
+  background-size: 200% 100%;
+  animation: berita-shimmer 1.4s linear infinite;
+}
+
+.berita-skeleton-lines {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-4) 0 0;
+}
+
+.berita-skeleton-line {
+  height: 0.85rem;
+  border-radius: 999px;
+  background: var(--green-050);
+}
+
+.berita-skeleton-line:last-child { width: 60%; }
+
+@keyframes berita-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Error + tombol muat ulang */
+.berita-error .berita-body {
+  gap: var(--sp-3);
+  padding-top: var(--sp-5);
+}
+
+.berita-error .berita-actions { margin-top: var(--sp-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .berita-skeleton .berita-media { animation: none; }
+}
 
 @media (hover: none) {
   .berita-badge { opacity: 1; }
