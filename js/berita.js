@@ -40,25 +40,36 @@
   const formatLikes = (n) =>
     n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}rb` : String(n);
 
-  /* Halaman detail berita di website ini. Semua berita (API maupun katalog
-     lokal) punya shortCode, jadi selalu ada link. */
-  const detailUrl = (item) => `berita.html?id=${encodeURIComponent(item.shortCode)}`;
+  /* ShortCode karangan (mis. PPDB di katalog lokal) bukan post Instagram,
+     jadi tidak boleh dipakai untuk proxy thumbnail. */
+  const proxyThumbSrc = (item) => {
+    if (!item.thumbnail) return "";
+    const shortCodeAsli =
+      typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
+    return shortCodeAsli
+      ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
+      : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+  };
 
-  /* Foto kartu. File lokal (fotoLokal) dipakai lebih dulu; kalau tidak ada,
-     pakai srcGambar dari API yang menunjuk proxy /api/thumbnail. Cover kategori
-     hanya jaring pengaman kalau file fotonya gagal dimuat. */
   const createCard = (item) => {
-    const judul = (item.title || splitCaption(item.text).title || "").trim();
+    const { title, excerpt } = splitCaption(item.text);
+    const judul = item.judulKurasi || title;
     const fig = document.createElement("article");
     fig.className = "berita-card reveal is-visible";
 
-    /* Klik kartu (foto maupun tombol) membuka halaman detail berita di website
-       ini. Post asli Instagram tetap tersedia di halaman detail tersebut. */
+    /* Kartu tidak lagi membuka halaman detail; foto dan tombolnya mengarah ke
+       post asli di Instagram. Halaman detail berita.html tetap bisa dibuka
+       langsung, tapi bukan lagi tujuan klik dari daftar. */
     const media = document.createElement("a");
     media.className = "berita-media";
-    media.href = detailUrl(item);
-    media.setAttribute("aria-label", `Baca berita: ${judul}`);
+    media.href = item.postUrl;
+    media.target = "_blank";
+    media.rel = "noopener noreferrer";
+    media.setAttribute("aria-label", `Lihat di Instagram: ${judul}`);
 
+    /* Selalu ada gambar: thumbnail dari proxy (kalau ada), kalau gagal turun ke
+       cover kategori. Cover kategori juga jadi gambar awal untuk berita yang
+       tidak punya thumbnail, sehingga tidak pernah ada kartu kosong. */
     const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
 
     const img = document.createElement("img");
@@ -72,11 +83,11 @@
       img.src = fallbackCover;
     };
 
-    const src = item.fotoLokal || item.srcGambar || "";
+    const proxySrc = proxyThumbSrc(item);
 
-    if (src) {
+    if (proxySrc) {
       img.addEventListener("error", showCover, { once: true });
-      img.src = src;
+      img.src = proxySrc;
     } else {
       showCover();
     }
@@ -107,7 +118,8 @@
     const meta = document.createElement("p");
     meta.className = "berita-meta";
     meta.textContent = [
-      item.isVideo ? "Video" : "Foto",
+      item.type === "info" ? "Info" : item.isVideo ? "Video" : "Foto",
+      formatDate(item.postedAt),
       item.likes ? `${formatLikes(item.likes)} suka` : "",
     ]
       .filter(Boolean)
@@ -118,7 +130,6 @@
     heading.textContent = judul;
     body.appendChild(heading);
 
-    const excerpt = (item.text || "").trim();
     if (excerpt && excerpt !== judul) {
       const para = document.createElement("p");
       para.className = "berita-excerpt";
@@ -128,34 +139,15 @@
 
     const link = document.createElement("a");
     link.className = "berita-link";
-    link.href = detailUrl(item);
-    link.textContent = "Baca berita";
-    link.setAttribute("aria-label", `Baca "${judul}" selengkapnya`);
+    link.href = item.postUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Lihat di Instagram";
+    link.setAttribute("aria-label", `Lihat "${judul}" di Instagram`);
     body.appendChild(link);
 
     fig.appendChild(body);
     return fig;
-  };
-
-  /* Kartu dikelompokkan per section, urutannya mengikuti file kurasi sekolah
-     (MPLS, Ekstrakurikuler, Peringatan Hari Besar, Prestasi, Berita Lainnya).
-     Hanya berita yang fotonya benar-benar ada yang ditampilkan, jadi tidak
-     ada kartu kosong. */
-  const groupBySection = (items) => {
-    const groups = [];
-    const byLabel = new Map();
-
-    for (const item of items) {
-      const label = item.kategoriLabel || "Berita Lainnya";
-      if (!byLabel.has(label)) {
-        const group = { label, kategori: item.kategori || "", items: [] };
-        byLabel.set(label, group);
-        groups.push(group);
-      }
-      byLabel.get(label).items.push(item);
-    }
-
-    return groups;
   };
 
   const createSkeleton = () => {
@@ -248,47 +240,25 @@
     window.setTimeout(() => load(attempt + 1), delay);
   };
 
-  /* Kartu dikelompokkan per section, mengikuti urutan file kurasi sekolah.
-     Berita tanpa foto tidak ikut tampil supaya tidak ada kartu kosong. */
-  const render = (allItems, meta) => {
-    const items = allItems.filter((item) => item.punyaFoto);
-    const groups = groupBySection(items);
-
+  const render = (items, meta) => {
     const fragment = document.createDocumentFragment();
-    for (const group of groups) {
-      const section = document.createElement("section");
-      section.className = "berita-group";
-
-      const heading = document.createElement("h3");
-      heading.className = "berita-group-title";
-      heading.textContent = group.label;
-      section.appendChild(heading);
-
-      const list = document.createElement("div");
-      list.className = "berita-group-grid";
-      group.items.forEach((item) => list.appendChild(createCard(item)));
-      section.appendChild(list);
-
-      fragment.appendChild(section);
-    }
+    items.forEach((item) => fragment.appendChild(createCard(item)));
     grid.replaceChildren(fragment);
     grid.classList.remove("is-loading");
 
     const terbaru = items.length ? formatDate(items[0].postedAt) : "";
-    const menunggu = allItems.length - items.length;
     setStatus(
       [
-        `${items.length} berita dari ${allItems.length}`,
+        `${items.length} berita`,
         terbaru ? `terbaru ${terbaru}` : "",
-        menunggu ? `${menunggu} berita menunggu foto` : "",
-        groups.length ? `${groups.length} section` : "",
+        meta && meta.dariKatalog ? `${meta.dariKatalog} dari katalog sekolah` : "",
         meta && meta.updatedAt ? `diperbarui ${formatDate(meta.updatedAt)}` : "",
       ]
         .filter(Boolean)
         .join(" · ")
     );
 
-    /* Katalog sekolah tetap tampil kalau API Instagram sedang bermasalah. */
+    /* Katalog lokal tetap tampil kalau API Instagram sedang bermasalah. */
     if (meta && meta.upstream === false) {
       setStatus(
         `${items.length} berita dari katalog sekolah · Instagram sedang tidak dapat dihubungi`,
@@ -296,7 +266,7 @@
       );
     }
 
-    renderPengumuman(allItems);
+    renderPengumuman(items);
   };
 
   const load = (attempt = 0) => {
@@ -359,10 +329,12 @@
   const renderPengumuman = (items) => {
     if (!pengumumanEl) return;
 
-    /* Sama seperti grid: hanya berita yang fotonya benar-benar ada, lalu
-       diambil tiga yang terbaru. Foto asli dipakai; cover kategori hanya
-       jaring pengaman kalau file fotonya gagal dimuat. */
-    const pilihan = items.filter((item) => item.punyaFoto).slice(0, 3);
+    /* Pengumuman info (PPDB, dll) didahulukan, lalu dilengkapi berita
+       terbaru lain. Shortcode dipakai sebagai kunci agar satu berita
+       tidak tampil dua kali. */
+    const info = items.filter((item) => item.type === "info");
+    const gabungan = [...new Map([...info, ...items].map((i) => [i.shortCode, i])).values()];
+    const pilihan = gabungan.slice(0, 3);
 
     if (!pilihan.length) {
       pengumumanEl.replaceChildren();
@@ -371,11 +343,14 @@
 
     pengumumanEl.replaceChildren(
       ...pilihan.map((item) => {
-        const judul = (item.title || splitCaption(item.text).title || "").trim();
-        const excerpt = (item.text || "").trim();
+        const { title, excerpt } = splitCaption(item.text);
+        const judul = item.judulKurasi || title;
         const card = document.createElement("article");
         card.className = "news-item reveal";
 
+        /* Foto asli dari Instagram kalau ada, sama seperti kartu grid.
+           Kalau proxy gagal atau berita ini dari katalog lokal (shortCode
+           karangan), turun ke cover kategori. */
         const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
         const thumb = document.createElement("img");
         thumb.className = "news-item-media";
@@ -383,10 +358,16 @@
         thumb.loading = "lazy";
         thumb.decoding = "async";
 
-        const src = item.fotoLokal || item.srcGambar || "";
-        if (src) {
-          thumb.addEventListener("error", () => { thumb.src = fallbackCover; }, { once: true });
-          thumb.src = src;
+        const proxySrc = proxyThumbSrc(item);
+        if (proxySrc) {
+          thumb.addEventListener(
+            "error",
+            () => {
+              thumb.src = fallbackCover;
+            },
+            { once: true }
+          );
+          thumb.src = proxySrc;
         } else {
           thumb.src = fallbackCover;
         }
@@ -397,7 +378,12 @@
 
         const meta = document.createElement("p");
         meta.className = "news-item-meta";
-        meta.textContent = item.kategoriLabel || "Pengumuman";
+        meta.textContent = [
+          item.kategoriLabel || "Pengumuman",
+          formatDate(item.postedAt),
+        ]
+          .filter(Boolean)
+          .join(" · ");
         body.appendChild(meta);
 
         const heading = document.createElement("h3");
@@ -412,9 +398,11 @@
 
         const link = document.createElement("a");
         link.className = "berita-link";
-        link.href = detailUrl(item);
-        link.textContent = "Baca berita";
-        link.setAttribute("aria-label", `Baca "${judul}" selengkapnya`);
+        link.href = item.postUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Lihat di Instagram";
+        link.setAttribute("aria-label", `Lihat "${judul}" di Instagram`);
         body.appendChild(link);
 
         card.appendChild(body);
