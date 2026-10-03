@@ -1,14 +1,10 @@
-import {
-  fetchUpstreamItems,
-  findUpstreamByShortCode,
-  isAllowedMediaUrl,
-  streamFromInstagram,
-} from "../lib/ig.js";
-
 /* Thumbnail Instagram juga punya URL yang kedaluwarsa, jadi lebih aman dipanggil
    per shortCode: /api/thumbnail?id=<shortCode>. Parameter ?url= tetap dipakai
    sebagai cadangan kalau shortCode tidak ada. */
-export default async function handler(req, res) {
+const { fetchUpstreamItems, findUpstreamByShortCode, isAllowedMediaUrl, streamFromInstagram } =
+  require("../lib/ig.js");
+
+module.exports = async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ ok: false, error: "method_not_allowed" });
@@ -44,14 +40,13 @@ export default async function handler(req, res) {
       return res.status(404).json({ ok: false, error: "gambar_tidak_ditemukan" });
     }
 
-    const result = await streamFromInstagram(target, req, res);
+    const result = await streamFromInstagram(target, req);
 
     if (result.body) return res.status(result.status).json(result.body);
 
-    const { upstream, type } = result;
-    const body = Buffer.from(await upstream.arrayBuffer());
+    const body = Buffer.from(await result.upstream.arrayBuffer());
 
-    res.setHeader("Content-Type", type);
+    res.setHeader("Content-Type", result.type);
     res.setHeader("Content-Length", String(body.length));
     return res.status(200).send(body);
   } catch (error) {
@@ -61,4 +56,4 @@ export default async function handler(req, res) {
       detail: String(error.message || error),
     });
   }
-}
+};

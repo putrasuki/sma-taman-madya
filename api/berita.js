@@ -1,11 +1,7 @@
-import { createRequire } from "node:module";
-
-import { fetchUpstreamItems } from "../lib/ig.js";
-
-/* createRequire supaya data/berita.json bisa dibaca tanpa 지원 import JSON
-   khusus di bundler Vercel. */
-const require = createRequire(import.meta.url);
+/* CommonJS + require biasa: paling aman untuk bundler Vercel (tanpa build step),
+   termasuk untuk data/berita.json. */
 const KATALOG = require("../data/berita.json");
+const { fetchUpstreamItems } = require("../lib/ig.js");
 
 const CACHE_SECONDS = 60 * 30;
 
@@ -182,4 +178,4 @@ const handler = async (req, res) => {
   }
 };
 
-export default handler;
+module.exports = handler;

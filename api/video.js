@@ -1,15 +1,11 @@
-import {
-  fetchUpstreamItems,
-  findUpstreamByShortCode,
-  isAllowedMediaUrl,
-  streamFromInstagram,
-} from "../lib/ig.js";
-
 /* Video: dipanggil per shortCode (/api/video?id=<shortCode>) supaya URL mp4
    Instagram diambil ulang setiap kali dibuka — URL itu hanya berlaku beberapa jam
    sehingga 403/502 kalau dipakai dari cache. Kalau tetap gagal, halaman detail
    otomatis jatuh ke embed Instagram. */
-export default async function handler(req, res) {
+const { fetchUpstreamItems, findUpstreamByShortCode, isAllowedMediaUrl, streamFromInstagram } =
+  require("../lib/ig.js");
+
+module.exports = async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ ok: false, error: "method_not_allowed" });
@@ -50,7 +46,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const result = await streamFromInstagram(target, req, res);
+    const result = await streamFromInstagram(target, req);
 
     if (result.body) return res.status(result.status).json(result.body);
 
@@ -74,4 +70,4 @@ export default async function handler(req, res) {
       detail: String(error.message || error),
     });
   }
-}
+};
