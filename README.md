@@ -24,8 +24,17 @@ Vercel otomatis redeploy setiap kali ada push ke branch `main`.
 | --- | --- |
 | `index.html` | Struktur halaman |
 | `css/styles.css` | Styling & layout |
-| `js/main.js` | Navigasi mobile, scroll reveal, active section |
+| `js/main.js` | Navigasi mobile, scroll reveal, active section, filter galeri fasilitas |
 | `img/hero-bg.jpg` | Foto utama (dipakai sebagai background hero via CSS) |
 | `img/*.svg` | Aset cadangan: avatar, post, kegiatan, gedung |
+
+## Berita
+
+`index.html` memuat 6 kartu berita statis sebagai fallback. Di server, `js/berita.js`
+menggantinya dengan data terbaru dari `api/berita.js` (proxy Instagram).
+
+Kalau fallback perlu disegarkan: unduh thumbnail terbaru lewat
+`/api/thumbnail?url=<thumbnail_url>` ke `img/berita/berita-N.jpg`, lalu perbarui
+judul, tanggal, jumlah suka, dan `?id=<shortCode>` di `index.html`.
 
 > Catatan: 4 gambar di section galeri masih placeholder, di-inline sebagai `data:` URI di dalam `index.html`. Ganti dengan foto asli kalau sudah tersedia.
