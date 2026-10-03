@@ -61,6 +61,11 @@
        tidak punya thumbnail, sehingga tidak pernah ada kartu kosong. */
     const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
 
+    /* ShortCode karangan (mis. PPDB di katalog lokal) bukan post Instagram,
+       jadi tidak boleh dipakai untuk proxy thumbnail. */
+    const shortCodeAsli =
+      typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
+
     const img = document.createElement("img");
     img.alt = judul;
     img.loading = "lazy";
@@ -72,11 +77,12 @@
       img.src = fallbackCover;
     };
 
-    const proxySrc = item.thumbnail
-      ? item.shortCode
+    const proxySrc =
+      item.thumbnail && shortCodeAsli
         ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
-        : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
-      : "";
+        : item.thumbnail
+        ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
+        : "";
 
     if (proxySrc) {
       img.addEventListener("error", showCover, { once: true });
@@ -258,6 +264,8 @@
         true
       );
     }
+
+    renderPengumuman(items);
   };
 
   const load = (attempt = 0) => {
@@ -309,6 +317,76 @@
         );
         setStatus("Berita gagal dimuat.");
       });
+  };
+
+  /* ---------- Pengumuman (section #pengumuman) ----------
+     Sebelumnya 3 item hardcode tanpa gambar dan tanpa link, jadi terlihat
+     tidak sinkron dengan grid berita. Sekarang diisi dari data yang sama:
+     berita bertipe info lebih dulu, lalu berita terbaru lainnya. */
+  const pengumumanEl = document.querySelector("[data-pengumuman-list]");
+
+  const renderPengumuman = (items) => {
+    if (!pengumumanEl) return;
+
+    const info = items.filter((item) => item.type === "info");
+    const pilihan = (info.length >= 3 ? info : info.concat(items)).slice(0, 3);
+
+    if (!pilihan.length) {
+      pengumumanEl.replaceChildren();
+      return;
+    }
+
+    pengumumanEl.replaceChildren(
+      ...pilihan.map((item) => {
+        const { title, excerpt } = splitCaption(item.text);
+        const judul = item.judulKurasi || title;
+        const card = document.createElement("article");
+        card.className = "news-item reveal";
+
+        const cover = document.createElement("img");
+        cover.className = "news-item-media";
+        cover.alt = "";
+        cover.loading = "lazy";
+        cover.decoding = "async";
+        cover.src = item.cover || "/img/berita/cover-berita.svg";
+        card.appendChild(cover);
+
+        const body = document.createElement("div");
+        body.className = "news-item-body";
+
+        const meta = document.createElement("p");
+        meta.className = "news-item-meta";
+        meta.textContent = [
+          item.kategoriLabel || "Pengumuman",
+          formatDate(item.postedAt),
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        body.appendChild(meta);
+
+        const heading = document.createElement("h3");
+        heading.textContent = judul;
+        body.appendChild(heading);
+
+        if (excerpt && excerpt !== judul) {
+          const para = document.createElement("p");
+          para.textContent = excerpt;
+          body.appendChild(para);
+        }
+
+        const link = document.createElement("a");
+        link.className = "berita-link";
+        link.href = item.postUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Lihat di Instagram";
+        link.setAttribute("aria-label", `Lihat "${judul}" di Instagram`);
+        body.appendChild(link);
+
+        card.appendChild(body);
+        return card;
+      })
+    );
   };
 
   load();

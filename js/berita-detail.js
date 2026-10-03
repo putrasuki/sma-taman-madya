@@ -72,14 +72,20 @@
 
   /* Proxy video lebih aman kalau dipanggil per shortCode: /api/video?id=...
      mengambil ulang URL mp4 dari upstream, jadi tidak ikut basi saat cache. */
+  /* Hanya shortCode Instagram asli yang boleh dipakai untuk proxy & embed.
+     Item katalog lokal (mis. PPDB) memakai shortCode karangan, jadi tidak
+     boleh diteruskan ke instagram.com. */
+  const hasRealShortCode = (item) =>
+    typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
+
   const videoProxyUrl = (item) =>
-    item.shortCode
+    hasRealShortCode(item)
       ? `/api/video?id=${encodeURIComponent(item.shortCode)}`
       : `/api/video?url=${encodeURIComponent(item.videoUrl)}`;
 
   /* Cadangan terakhir: embed resmi Instagram (mp4 bisa kedaluwarsa). */
   const embedUrl = (item) =>
-    item.shortCode
+    hasRealShortCode(item)
       ? `https://www.instagram.com/p/${encodeURIComponent(item.shortCode)}/embed/captioned/`
       : "";
 
@@ -212,7 +218,7 @@
     /* Video: coba <video> dari proxy; kalau mp4 Instagram sudah kedaluwarsa
        (502/403), otomatis ganti ke embed Instagram agar tetap bisa dibuka. */
     const bisaStream =
-      item.isVideo && item.shortCode && (item.videoUrl || item.sumber !== "katalog");
+      item.isVideo && hasRealShortCode(item) && (item.videoUrl || item.sumber !== "katalog");
 
     if (bisaStream) {
       removeEmbed();
