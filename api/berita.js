@@ -1,9 +1,28 @@
-/* CommonJS + require biasa: paling aman untuk bundler Vercel (tanpa build step),
-   termasuk untuk data/berita.json. */
+/* Daftar berita SMA Taman Madya Jetis.
+
+   Sumber data utama adalah file kurasi sekolah (data/berita.json, diturunkan
+   dari "Daftar berita sma taman madya jetis.docx"). File itu yang menentukan
+   berita mana yang tampil, urutannya, dan kategori section-nya. Feed API
+   Instagram hanya dipakai sebagai sumber tambahan: foto, jumlah suka, dan
+   tanggal unggah.
+
+   Kenapa feed API tidak dipakai sebagai daftar utama? Feed Instagram hanya
+   mengembalikan 12 post terbaru, sehingga berita lama yang masih relevan
+   hilang dari situs. Dengan file kurasi sebagai acuan, ke-20 berita sekolah
+   tetap punya alamat (berita.html?id=...).
+
+   Foto Instagram hanya berlaku beberapa jam (parameter `oe` di URL-nya).
+   Karena itu /api/thumbnail me-resolve ulang URL dari upstream tiap
+   permintaan, bukan memakai URL yang tersimpan di respons ini.
+
+   Ditulis CommonJS karena repo ini tidak punya package.json, dan Vercel
+   memakai bundler bawaan yang membaca require() tanpa konfigurasi tambahan. */
 const KATALOG = require("../data/berita.json");
 const { fetchUpstreamItems } = require("../lib/ig.js");
 
 const CACHE_SECONDS = 60 * 30;
+
+const proxyThumb = (shortCode) => `/api/thumbnail?id=${encodeURIComponent(shortCode)}`;
 
 function plainText(caption) {
   if (typeof caption !== "string") return "";
@@ -15,106 +34,81 @@ function plainText(caption) {
     .trim();
 }
 
-function normalise(item) {
-  const text = plainText(item.caption);
-  return {
-    id: String(item.id),
-    shortCode: item.short_code,
-    type: item.is_video ? "video" : "image",
-    isVideo: Boolean(item.is_video),
-    text,
-    hashtags: Array.isArray(item.hashtags) ? item.hashtags : [],
-    thumbnail: item.thumbnail_url || (Array.isArray(item.images) ? item.images[0] : "") || "",
-    cover: "",
-    videoUrl: item.is_video ? item.video_url || "" : "",
-    likes: Number(item.likes) || 0,
-    postedAt: item.posted_at,
-    postUrl: item.post_url || `https://www.instagram.com/p/${item.short_code}/`,
-  };
-}
+/* Satu berita = satu baris file kurasi, ditambah data dari feed API bila
+   postnya masih ada di sana. */
+function gabung(upstreamItems) {
+  const byCode = new Map();
+  for (const item of upstreamItems) {
+    if (item && item.short_code) byCode.set(item.short_code, item);
+  }
 
-/* Katalog lokal (data/berita.json) berisi berita yang belum ada di API Instagram.
-   API tetap jadi sumber thumbnail, jumlah suka, dan video; katalog lokal menambah
-   judul rapi, kategori, dan berita yang belum ter-scrape. */
-function dariKatalog(row) {
-  return {
-    id: `lokal-${row.shortCode}`,
-    shortCode: row.shortCode,
-    type: row.tipe === "post" ? "image" : row.tipe === "info" ? "info" : "video",
-    isVideo: row.tipe === "reel",
-    text: row.ringkas || row.judul,
-    hashtags: [],
-    thumbnail: "",
-    cover: row.cover,
-    videoUrl: "",
-    likes: 0,
-    postedAt: row.tanggal,
-    postUrl: row.url,
-  };
-}
+  return KATALOG.items.map((row) => {
+    const up = byCode.get(row.shortCode) || null;
+    const thumbnail = up ? up.thumbnail_url || (Array.isArray(up.images) ? up.images[0] : "") || "" : "";
+    const fotoLokal = row.fotoLokal || "";
 
-function gabung(apiItems) {
-  const map = new Map(apiItems.map((item) => [item.shortCode, { ...item, sumber: "api" }]));
+    /* Foto yang benar-benar bisa ditampilkan: file lokal, atau thumbnail dari
+       post yang masih ada di feed. Cover kategori hanya jaring pengaman, bukan
+       gambar utama — itu sebabnya berita tanpa foto tidak ikut tampil. */
+    const srcGambar = fotoLokal || (thumbnail ? proxyThumb(row.shortCode) : "");
 
-  KATALOG.forEach((row) => {
-    const ada = map.get(row.shortCode);
-
-    if (ada) {
-      ada.kategori = row.kategori;
-      ada.kategoriLabel = row.kategoriLabel;
-      ada.cover = row.cover;
-      ada.judulKurasi = row.judul;
-      return;
-    }
-
-    map.set(row.shortCode, { ...dariKatalog(row), sumber: "katalog", kategori: row.kategori, kategoriLabel: row.kategoriLabel, judulKurasi: row.judul });
+    return {
+      urutan: row.urutan,
+      shortCode: row.shortCode,
+      id: row.shortCode,
+      type: row.tipe === "post" ? "image" : "reel" ? "video" : "image",
+      isVideo: row.tipe === "reel",
+      title: row.judul,
+      subJudul: row.subJudul || "",
+      text: plainText(row.ringkas || row.judul),
+      hashtags: [],
+      kategori: row.kategori,
+      kategoriLabel: row.kategoriLabel,
+      cover: row.cover || "",
+      fotoLokal,
+      srcGambar,
+      punyaFoto: Boolean(srcGambar),
+      thumbnail: "",
+      videoUrl: up && up.is_video ? up.video_url || "" : "",
+      likes: up ? Number(up.likes) || 0 : 0,
+      postedAt: up && up.posted_at ? up.posted_at : "",
+      postUrl: row.url,
+      diFeed: Boolean(up),
+    };
   });
-
-  return [...map.values()].sort(
-    (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-  );
 }
 
 const handler = async (req, res) => {
   const okCache = `s-maxage=${CACHE_SECONDS}, stale-while-revalidate=86400`;
+  const noStore = "no-store";
 
   /* Respons gagal tidak boleh di-cache CDN, supaya pengunjung berikutnya
-     selalu mencoba ulang ke upstream alih-alih menerima error yang sama. */
+     selalu mencoba ulang alih-alih menerima error yang sama. */
   const send = (status, body, cacheControl) => {
     res.setHeader("Cache-Control", cacheControl);
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     return res.status(status).json(body);
   };
 
-  /* Kalau upstream mati, katalog lokal tetap bisa ditampilkan — lebih baik
-     daripada kartu error kosong. */
-  const dariKatalogSaja = () => gabung([]);
-
   try {
     let items;
     let upstreamOk = true;
 
     try {
-      const mentah = await fetchUpstreamItems();
-      items = gabung(mentah.map(normalise));
-      upstreamOk = items.length > 0;
+      items = gabung(await fetchUpstreamItems());
     } catch (error) {
+      /* Feed Instagram bermasalah: file kurasi sekolah tetap bisa dipakai.
+         Foto lokal tetap tampil karena tidak bergantung pada feed. */
       upstreamOk = false;
-      items = dariKatalogSaja();
+      items = gabung([]);
       process.stderr.write(`[api/berita] upstream gagal: ${error.message}\n`);
     }
 
     if (!items.length) {
       return send(
         200,
-        {
-          ok: false,
-          error: "tidak_ada_berita",
-          updatedAt: new Date().toISOString(),
-          items: [],
-          item: null,
-        },
-        "no-store"
+        { ok: false, error: "tidak_ada_berita", updatedAt: new Date().toISOString(), items: [], item: null },
+        noStore
       );
     }
 
@@ -122,16 +116,10 @@ const handler = async (req, res) => {
     const rawId = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
     if (rawId) {
       const needle = String(rawId).trim();
-      const found = items.find(
-        (item) => item.shortCode === needle || item.id === needle
-      );
+      const found = items.find((item) => item.shortCode === needle || item.id === needle);
 
       if (!found) {
-        return send(
-          404,
-          { ok: false, error: "berita_tidak_ditemukan", item: null },
-          "no-store"
-        );
+        return send(404, { ok: false, error: "berita_tidak_ditemukan", item: null }, noStore);
       }
 
       const position = items.indexOf(found);
@@ -158,23 +146,15 @@ const handler = async (req, res) => {
         upstream: upstreamOk,
         updatedAt: new Date().toISOString(),
         total: items.length,
-        dariApi: items.filter((item) => item.sumber === "api").length,
-        dariKatalog: items.filter((item) => item.sumber === "katalog").length,
+        denganFoto: items.filter((item) => item.punyaFoto).length,
+        dariFeed: items.filter((item) => item.diFeed).length,
+        fotoLokal: items.filter((item) => item.fotoLokal).length,
         items,
       },
       okCache
     );
   } catch (error) {
-    return send(
-      200,
-      {
-        ok: false,
-        error: String(error.message || error),
-        items: [],
-        item: null,
-      },
-      "no-store"
-    );
+    return send(200, { ok: false, error: String(error.message || error), items: [], item: null }, noStore);
   }
 };
 

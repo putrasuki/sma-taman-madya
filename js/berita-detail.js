@@ -60,24 +60,28 @@
 
   const coverOf = (item) => item.cover || "/img/berita/cover-berita.svg";
 
-  /* Thumbnail lewat proxy pakai shortCode supaya proxy mengambil URL baru dari
-     upstream (URL Instagram cepat kedaluwarsa). Kalau tidak ada shortCode,
-     jatuh ke parameter url; kalau gagal semua, turun ke cover kategori. */
+  /* Judul bersih dari file kurasi sekolah. Caption Instagram hanya dipakai
+     cadangan kalau judulnya belum diisi. */
+  const judulOf = (item) =>
+    (item.title || item.judulKurasi || shortTitle(item.text || "")).trim();
+
+  /* Foto utama berita. File lokal (fotoLokal) dipakai lebih dulu; kalau postnya
+     masih ada di feed Instagram, fotonya diambil lewat proxy /api/thumbnail
+     supaya URL-nya selalu yang terbaru. Cover kategori hanya jaring pengaman. */
   const thumbUrl = (item) => {
-    if (!item.thumbnail) return coverOf(item);
-    return item.shortCode
-      ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
-      : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+    if (item.fotoLokal) return item.fotoLokal;
+    if (item.srcGambar) return item.srcGambar;
+    return coverOf(item);
   };
 
-  /* Proxy video lebih aman kalau dipanggil per shortCode: /api/video?id=...
-     mengambil ulang URL mp4 dari upstream, jadi tidak ikut basi saat cache. */
   /* Hanya shortCode Instagram asli yang boleh dipakai untuk proxy & embed.
-     Item katalog lokal (mis. PPDB) memakai shortCode karangan, jadi tidak
-     boleh diteruskan ke instagram.com. */
+     Semua shortCode di data/berita.json berasal dari file kurasi sekolah, jadi
+     ini hanya penjaga agar shortCode karangan tidak pernah diteruskan. */
   const hasRealShortCode = (item) =>
     typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
 
+  /* Proxy video lebih aman kalau dipanggil per shortCode: /api/video?id=...
+     mengambil ulang URL mp4 dari upstream, jadi tidak ikut basi saat cache. */
   const videoProxyUrl = (item) =>
     hasRealShortCode(item)
       ? `/api/video?id=${encodeURIComponent(item.shortCode)}`
@@ -107,7 +111,7 @@
 
     const iframe = document.createElement("iframe");
     iframe.setAttribute("src", embedUrl(item));
-    iframe.setAttribute("title", `Instagram: ${item.judulKurasi || shortTitle(item.text)}`);
+    iframe.setAttribute("title", `Instagram: ${judulOf(item)}`);
     iframe.setAttribute("loading", "lazy");
     iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
     iframe.setAttribute("allowfullscreen", "");
@@ -195,7 +199,7 @@
       .filter(Boolean)
       .join(" · ");
 
-    titleEl.textContent = item.judulKurasi || shortTitle(item.text);
+    titleEl.textContent = judulOf(item);
 
     const poster = thumbUrl(item);
 
@@ -205,7 +209,7 @@
       videoEl.removeAttribute("src");
       imageEl.hidden = false;
       imageEl.src = poster;
-      imageEl.alt = item.judulKurasi || shortTitle(item.text);
+      imageEl.alt = judulOf(item);
       imageEl.addEventListener(
         "error",
         () => {
@@ -218,7 +222,7 @@
     /* Video: coba <video> dari proxy; kalau mp4 Instagram sudah kedaluwarsa
        (502/403), otomatis ganti ke embed Instagram agar tetap bisa dibuka. */
     const bisaStream =
-      item.isVideo && hasRealShortCode(item) && (item.videoUrl || item.sumber !== "katalog");
+      item.isVideo && hasRealShortCode(item) && Boolean(item.videoUrl || item.diFeed);
 
     if (bisaStream) {
       removeEmbed();
@@ -247,10 +251,13 @@
       );
 
       videoEl.src = videoProxyUrl(item);
-    } else if (item.isVideo && embedUrl(item)) {
-      /* Reel dari katalog sekolah: tidak ada mp4 di API, jadi embed saja. */
+    } else if (item.isVideo && embedUrl(item) && !item.srcGambar) {
+      /* Reel tanpa foto (mis. post lama yang sudah tidak ada di feed API):
+         tidak ada yang bisa ditampilkan sebagai sampul, jadi pakai embed. */
       showEmbed(item);
     } else {
+      /* Reel yang fotonya masih ada: tampilkan fotonya. Embed Instagram
+         sudah dipakai sebagai tombol "Lihat di Instagram" di bawah. */
       showImage();
     }
 

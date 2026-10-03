@@ -816,6 +816,30 @@ h3 { color: var(--ink-900); font-size: var(--step-1); line-height: 1.35; }
 .berita-grid {
   display: grid;
   gap: var(--sp-5);
+}
+
+/* Kartu dikelompokkan per section, urutan section mengikuti file kurasi
+   sekolah. Grid tiap section yang menentukan jumlah kolom. */
+.berita-group {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.berita-group + .berita-group {
+  margin-top: var(--sp-6);
+}
+
+.berita-group-title {
+  margin: 0;
+  padding-bottom: var(--sp-2);
+  font-size: 1.0625rem;
+  color: var(--green-900);
+  border-bottom: 2px solid var(--green-100);
+}
+
+.berita-group-grid {
+  display: grid;
+  gap: var(--sp-5);
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 }
 
