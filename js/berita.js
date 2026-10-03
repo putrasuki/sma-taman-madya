@@ -346,7 +346,11 @@
         const { title, excerpt } = splitCaption(item.text);
         const judul = item.judulKurasi || title;
         const card = document.createElement("article");
-        card.className = "news-item reveal";
+        /* "is-visible" wajib ikut sekarang: kartu ini dirender setelah
+           js/main.js selesai memasang IntersectionObserver untuk animasi
+           scroll reveal, jadi tanpa itu .js .reveal akan membiarkan
+           opacity: 0 dan teksnya tidak pernah terlihat. */
+        card.className = "news-item reveal is-visible";
 
         /* Foto asli dari Instagram kalau ada, sama seperti kartu grid.
            Kalau proxy gagal atau berita ini dari katalog lokal (shortCode
