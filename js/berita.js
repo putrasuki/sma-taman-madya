@@ -2,6 +2,8 @@
   "use strict";
 
   const ENDPOINT = "/api/berita";
+  const MAX_ATTEMPTS = 3;
+  const RETRY_DELAYS = [1500, 4000];
   const INSTAGRAM_URL = "https://www.instagram.com/tamanmadyajetisyogya1956/";
   const LOCAL_HINT =
     "Feed berita diambil dari /api/berita. Untuk mencoba di komputer, jalankan `npx vercel dev` — atau cek versi live di sma-taman-madya.vercel.app.";
@@ -186,6 +188,11 @@
     grid.classList.remove("is-loading");
   };
 
+  const retryLater = (attempt) => {
+    const delay = RETRY_DELAYS[attempt] ?? RETRY_DELAYS[RETRY_DELAYS.length - 1];
+    window.setTimeout(() => load(attempt + 1), delay);
+  };
+
   const render = (items, updatedAt) => {
     const fragment = document.createDocumentFragment();
     items.forEach((item) => fragment.appendChild(createCard(item)));
@@ -204,19 +211,33 @@
     );
   };
 
-  const load = () => {
-    showSkeleton();
-    setStatus("");
+  const load = (attempt = 0) => {
+    if (attempt === 0) {
+      showSkeleton();
+      setStatus("");
+    } else {
+      setStatus(`Memuat ulang berita… (percobaan ${attempt + 1} dari ${MAX_ATTEMPTS})`);
+    }
 
-    fetch(ENDPOINT, { headers: { Accept: "application/json" } })
+    /* Percobaan ulang memakai query unik supaya respons gagal yang sempat
+       tersimpan di cache CDN tidak diambil lagi. */
+    const url = attempt === 0 ? ENDPOINT : `${ENDPOINT}?_=${Date.now()}`;
+
+    fetch(url, { headers: { Accept: "application/json" } })
       .then((res) => res.json())
       .then((payload) => {
         if (payload && payload.ok && payload.items.length) {
           render(payload.items, payload.updatedAt);
           return;
         }
-        const reason =
-          (payload && payload.error && ` (${payload.error})`) || "";
+
+        const reason = (payload && payload.error && ` (${payload.error})`) || "";
+
+        if (attempt < MAX_ATTEMPTS - 1) {
+          retryLater(attempt);
+          return;
+        }
+
         showError(
           `Kabar terbaru belum bisa diambil dari server${reason}. Coba lagi sebentar lagi.`,
           load,
@@ -225,6 +246,11 @@
         setStatus("Berita gagal dimuat.");
       })
       .catch(() => {
+        if (attempt < MAX_ATTEMPTS - 1) {
+          retryLater(attempt);
+          return;
+        }
+
         showError(
           isLocalPreview()
             ? "Halaman ini dibuka tanpa server, jadi /api/berita tidak tersedia."

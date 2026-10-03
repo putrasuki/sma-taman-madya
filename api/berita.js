@@ -31,8 +31,15 @@ function normalise(item) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader("Cache-Control", `s-maxage=${CACHE_SECONDS}, stale-while-revalidate=86400`);
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  const okCache = `s-maxage=${CACHE_SECONDS}, stale-while-revalidate=86400`;
+
+  /* Respons gagal tidak boleh di-cache CDN, supaya pengunjung berikutnya
+     selalu mencoba ulang ke upstream alih-alih menerima error yang sama. */
+  const send = (status, body, cacheControl) => {
+    res.setHeader("Cache-Control", cacheControl);
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    return res.status(status).json(body);
+  };
 
   try {
     const upstream = await fetch(UPSTREAM, {
@@ -46,6 +53,20 @@ module.exports = async function handler(req, res) {
     const payload = await upstream.json();
     const items = (Array.isArray(payload.data) ? payload.data : []).map(normalise);
 
+    if (!items.length) {
+      return send(
+        200,
+        {
+          ok: false,
+          error: "upstream_kosong",
+          updatedAt: new Date().toISOString(),
+          items: [],
+          item: null,
+        },
+        "no-store"
+      );
+    }
+
     /* ---- Mode detail: /api/berita?id=<shortCode> ---- */
     const rawId = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
     if (rawId) {
@@ -55,32 +76,48 @@ module.exports = async function handler(req, res) {
       );
 
       if (!found) {
-        return res.status(404).json({ ok: false, error: "berita_tidak_ditemukan", item: null });
+        return send(
+          404,
+          { ok: false, error: "berita_tidak_ditemukan", item: null },
+          "no-store"
+        );
       }
 
       const position = items.indexOf(found);
-      return res.status(200).json({
-        ok: true,
-        updatedAt: new Date().toISOString(),
-        item: found,
-        prev: position > 0 ? items[position - 1] : null,
-        next: position < items.length - 1 ? items[position + 1] : null,
-        total: items.length,
-      });
+      return send(
+        200,
+        {
+          ok: true,
+          updatedAt: new Date().toISOString(),
+          item: found,
+          prev: position > 0 ? items[position - 1] : null,
+          next: position < items.length - 1 ? items[position + 1] : null,
+          total: items.length,
+        },
+        okCache
+      );
     }
 
     /* ---- Mode daftar ---- */
-    return res.status(200).json({
-      ok: true,
-      updatedAt: new Date().toISOString(),
-      items,
-    });
+    return send(
+      200,
+      {
+        ok: true,
+        updatedAt: new Date().toISOString(),
+        items,
+      },
+      okCache
+    );
   } catch (error) {
-    return res.status(200).json({
-      ok: false,
-      error: String(error.message || error),
-      items: [],
-      item: null,
-    });
+    return send(
+      200,
+      {
+        ok: false,
+        error: String(error.message || error),
+        items: [],
+        item: null,
+      },
+      "no-store"
+    );
   }
 };
