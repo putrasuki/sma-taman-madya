@@ -40,6 +40,17 @@
   const formatLikes = (n) =>
     n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}rb` : String(n);
 
+  /* ShortCode karangan (mis. PPDB di katalog lokal) bukan post Instagram,
+     jadi tidak boleh dipakai untuk proxy thumbnail. */
+  const proxyThumbSrc = (item) => {
+    if (!item.thumbnail) return "";
+    const shortCodeAsli =
+      typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
+    return shortCodeAsli
+      ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
+      : `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`;
+  };
+
   const createCard = (item) => {
     const { title, excerpt } = splitCaption(item.text);
     const judul = item.judulKurasi || title;
@@ -61,11 +72,6 @@
        tidak punya thumbnail, sehingga tidak pernah ada kartu kosong. */
     const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
 
-    /* ShortCode karangan (mis. PPDB di katalog lokal) bukan post Instagram,
-       jadi tidak boleh dipakai untuk proxy thumbnail. */
-    const shortCodeAsli =
-      typeof item.shortCode === "string" && /^[A-Za-z0-9_-]{8,}$/.test(item.shortCode);
-
     const img = document.createElement("img");
     img.alt = judul;
     img.loading = "lazy";
@@ -77,12 +83,7 @@
       img.src = fallbackCover;
     };
 
-    const proxySrc =
-      item.thumbnail && shortCodeAsli
-        ? `/api/thumbnail?id=${encodeURIComponent(item.shortCode)}`
-        : item.thumbnail
-        ? `/api/thumbnail?url=${encodeURIComponent(item.thumbnail)}`
-        : "";
+    const proxySrc = proxyThumbSrc(item);
 
     if (proxySrc) {
       img.addEventListener("error", showCover, { once: true });
@@ -328,8 +329,12 @@
   const renderPengumuman = (items) => {
     if (!pengumumanEl) return;
 
+    /* Pengumuman info (PPDB, dll) didahulukan, lalu dilengkapi berita
+       terbaru lain. Shortcode dipakai sebagai kunci agar satu berita
+       tidak tampil dua kali. */
     const info = items.filter((item) => item.type === "info");
-    const pilihan = (info.length >= 3 ? info : info.concat(items)).slice(0, 3);
+    const gabungan = [...new Map([...info, ...items].map((i) => [i.shortCode, i])).values()];
+    const pilihan = gabungan.slice(0, 3);
 
     if (!pilihan.length) {
       pengumumanEl.replaceChildren();
@@ -343,13 +348,30 @@
         const card = document.createElement("article");
         card.className = "news-item reveal";
 
-        const cover = document.createElement("img");
-        cover.className = "news-item-media";
-        cover.alt = "";
-        cover.loading = "lazy";
-        cover.decoding = "async";
-        cover.src = item.cover || "/img/berita/cover-berita.svg";
-        card.appendChild(cover);
+        /* Foto asli dari Instagram kalau ada, sama seperti kartu grid.
+           Kalau proxy gagal atau berita ini dari katalog lokal (shortCode
+           karangan), turun ke cover kategori. */
+        const fallbackCover = item.cover || "/img/berita/cover-berita.svg";
+        const thumb = document.createElement("img");
+        thumb.className = "news-item-media";
+        thumb.alt = "";
+        thumb.loading = "lazy";
+        thumb.decoding = "async";
+
+        const proxySrc = proxyThumbSrc(item);
+        if (proxySrc) {
+          thumb.addEventListener(
+            "error",
+            () => {
+              thumb.src = fallbackCover;
+            },
+            { once: true }
+          );
+          thumb.src = proxySrc;
+        } else {
+          thumb.src = fallbackCover;
+        }
+        card.appendChild(thumb);
 
         const body = document.createElement("div");
         body.className = "news-item-body";
