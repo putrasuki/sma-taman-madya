@@ -100,11 +100,11 @@
     wrap.setAttribute("data-detail-embed", "");
 
     const iframe = document.createElement("iframe");
-    iframe.src = embedUrl(item);
-    iframe.title = `Instagram: ${item.judulKurasi || shortTitle(item.text)}`;
-    iframe.loading = "lazy";
-    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
-    iframe.allowFullscreen = true;
+    iframe.setAttribute("src", embedUrl(item));
+    iframe.setAttribute("title", `Instagram: ${item.judulKurasi || shortTitle(item.text)}`);
+    iframe.setAttribute("loading", "lazy");
+    iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+    iframe.setAttribute("allowfullscreen", "");
     wrap.appendChild(iframe);
 
     const note = document.createElement("p");
@@ -113,7 +113,11 @@
       "Video dimuat langsung dari Instagram. Jika tidak muncul, buka lewat tombol “Lihat di Instagram”.";
     wrap.appendChild(note);
 
-    if (figureEl) figureEl.appendChild(wrap);
+    /* Sisipkan sebelum <figcaption> supaya urutannya tetap
+       media → catatan → caption, sama seperti video & gambar. */
+    if (figureEl) {
+      figureEl.insertBefore(wrap, figureEl.querySelector("figcaption") || null);
+    }
   };
 
   /* ---------- Elemen ---------- */
